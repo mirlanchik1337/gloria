@@ -41,6 +41,10 @@ class Flowers(models.Model):
     price = models.IntegerField(unique=True)
     is_hit = models.BooleanField()
     category = models.ManyToManyField(Category, verbose_name='category_product')
-
     def __str__(self):
         return self.name_product
+
+
+class Review(models.Model):
+    text = models.CharField(max_length=255, verbose_name='Комментарий к продукту')
+    product = models.ForeignKey('Flowers', on_delete=models.CASCADE)
