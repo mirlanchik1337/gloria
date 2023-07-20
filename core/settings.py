@@ -31,13 +31,11 @@ LIBRARY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'jazzmin',
-
 ]
 LOCAL_APPS = [
-    'apps.orders',
     'apps.product',
     'apps.users',
-    'main'
+    'apps.cart'
 ]
 
 INSTALLED_APPS = [
