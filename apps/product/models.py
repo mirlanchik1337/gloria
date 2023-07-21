@@ -3,6 +3,7 @@ from django.db import models
 
 class Product(models.Model):
     title = models.CharField(max_length=100, unique=True, verbose_name='Название товара')
+    image = models.ImageField(verbose_name='Картинка товара', null=True, blank=True)
     price = models.IntegerField(verbose_name='Цена товара')
     discount_price = models.IntegerField(verbose_name='Цена со скидкой', blank=True, null=True)
     postcard = models.IntegerField(verbose_name='Открытка', default=25, blank=True, null=True)
