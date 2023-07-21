@@ -1,8 +1,16 @@
 from django.contrib import admin
-from apps.product.models import (Postcard, Flowers, SweetGift, Balloon, Review)
+from apps.product.models import (Product, Category, Subcategory)
 
-admin.site.register(Postcard)
-admin.site.register(Flowers)
-admin.site.register(SweetGift)
-admin.site.register(Balloon)
-admin.site.register(Review)
+
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('title', 'price', 'description', 'is_hit', 'is_sale', 'categories')
+    list_filter = ('price', 'categories')
+    search_fields = ('title', 'description')
+
+    class Meta:
+        ordering = ('title', 'price')
+
+
+admin.site.register(Product, ProductAdmin)
+admin.site.register(Category)
+admin.site.register(Subcategory)
