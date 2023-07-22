@@ -1,19 +1,19 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from .models import (Product, Category, Subcategory)
 from .serializers import (ProductSerializer, CategorySerializer, SubcategorySerializer)
 
 
-class ProductViewSet(ModelViewSet):
+class ProductViewSet(ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
 
-class CategoryViewSet(ModelViewSet):
+class CategoryViewSet(ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
-class SubcategoryViewSet(ModelViewSet):
+class SubcategoryViewSet(ReadOnlyModelViewSet):
     queryset = Subcategory.objects.all()
     serializer_class = SubcategorySerializer
 
