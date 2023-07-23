@@ -1,6 +1,20 @@
 from django.db import models
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=50, verbose_name='Название категории')
+
+    def __str__(self):
+        return self.name
+
+
+class Subcategory(models.Model):
+    title = models.CharField(max_length=50, verbose_name='Название подкатегории')
+
+    def __str__(self):
+        return self.title
+
+
 class Product(models.Model):
     title = models.CharField(max_length=100, unique=True, verbose_name='Название товара')
     image = models.ImageField(verbose_name='Картинка товара', null=True, blank=True)
@@ -13,23 +27,9 @@ class Product(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара')
-    categories = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория товара')
-    subcategories = models.ForeignKey('Subcategory', on_delete=models.CASCADE, verbose_name='Подкатегория товара', null=True, blank=True)
-
-
-    def __str__(self):
-        return self.title
-
-class Category(models.Model):
-    title = models.CharField(max_length=50, verbose_name='Название категории')
+    categories = models.ForeignKey(Category, on_delete=models.CASCADE,  verbose_name='Категория товара', null=True, blank=True)
+    subcategories = models.ForeignKey(Subcategory, on_delete=models.CASCADE, verbose_name='Подкатегория товара',
+                                      null=True, blank=True)
 
     def __str__(self):
         return self.title
-
-class Subcategory(models.Model):
-    title = models.CharField(max_length=50, verbose_name='Название подкатегории')
-
-    def __str__(self):
-        return self.title
-
-

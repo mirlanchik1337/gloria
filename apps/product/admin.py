@@ -1,5 +1,5 @@
-from django.contrib import admin
 from apps.product.models import (Product, Category, Subcategory)
+from django.contrib import admin
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -9,6 +9,11 @@ class ProductAdmin(admin.ModelAdmin):
 
     class Meta:
         ordering = ('title', 'price')
+
+    def get_categories(self, obj):
+        return ", ".join([category.name for category in obj.categories.all()])
+
+    get_categories.short_description = 'Categories'
 
 
 admin.site.register(Product, ProductAdmin)
