@@ -9,9 +9,6 @@ class ProductViewSet(ReadOnlyModelViewSet):
     serializer_class = ProductSerializer
 
 
-class ProductDetailApiView(RetrieveAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
@@ -19,9 +16,6 @@ class CategoryViewSet(ReadOnlyModelViewSet):
     serializer_class = CategorySerializer
 
 
-class CategoryDetailApiView(RetrieveAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
 
 
 
@@ -30,6 +24,3 @@ class SubcategoryViewSet(ReadOnlyModelViewSet):
     serializer_class = SubcategorySerializer
 
 
-class SubcategoryDetailApiView(RetrieveAPIView):
-    queryset = Subcategory.objects.all()
-    serializer_class = SubcategorySerializer

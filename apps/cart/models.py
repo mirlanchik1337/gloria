@@ -1,7 +1,6 @@
 # models.py
 from django.contrib.auth.models import User
 from django.db import models
-
 from apps.product.models import Product
 
 
@@ -12,4 +11,4 @@ class CartItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.product
+        return f'{self.product}'
