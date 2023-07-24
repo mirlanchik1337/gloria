@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Category(models.Model):
@@ -20,7 +21,6 @@ class Product(models.Model):
     image = models.ImageField(verbose_name='Картинка товара', null=True, blank=True)
     price = models.IntegerField(verbose_name='Цена товара')
     discount_price = models.IntegerField(verbose_name='Цена со скидкой', blank=True, null=True)
-    postcard = models.IntegerField(verbose_name='Открытка', default=25, blank=True, null=True)
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
     is_sale = models.BooleanField(default=False, verbose_name='Акционный товар')
@@ -33,3 +33,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    text = models.CharField(max_length=255, verbose_name="Комментарий")
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, verbose_name='Товар')
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+
+    def __str__(self):
+        return f'{self.product}_{self.user}_{self.text}'
