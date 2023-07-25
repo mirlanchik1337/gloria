@@ -12,7 +12,9 @@ class CartItemListCreateView(generics.ListCreateAPIView):
     def delete(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
         cart_items.delete()
-        return Response({'message': 'Корзина была успешно очищена.'}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "Корзина была успешно очищена."}, status=status.HTTP_200_OK
+        )
 
 
 class CartItemDetailView(generics.RetrieveDestroyAPIView):

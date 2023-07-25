@@ -1,7 +1,12 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from .models import (Product, Category, Subcategory)
-from .serializers import (ProductSerializer, CategorySerializer, SubcategorySerializer)
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from .models import Product, Category, Subcategory, QuationsAnswers
+from .serializers import (
+    ProductSerializer,
+    CategorySerializer,
+    SubcategorySerializer,
+    QuationsAnswersSerializer,
+)
 
 
 class ProductViewSet(ReadOnlyModelViewSet):
@@ -9,14 +14,9 @@ class ProductViewSet(ReadOnlyModelViewSet):
     serializer_class = ProductSerializer
 
 
-
-
 class CategoryViewSet(ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-
-
 
 
 class SubcategoryViewSet(ReadOnlyModelViewSet):
@@ -24,3 +24,6 @@ class SubcategoryViewSet(ReadOnlyModelViewSet):
     serializer_class = SubcategorySerializer
 
 
+class QuationsAnswersViewSet(ReadOnlyModelViewSet):
+    qweryset = QuationsAnswers.objects.all()
+    serializer_class = QuationsAnswersSerializer

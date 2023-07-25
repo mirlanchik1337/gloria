@@ -33,3 +33,11 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class QuationsAnswers(models.Model):
+    title = models.TextField(verbose_name="Вопрос", blank=True, null=True)
+    description = models.TextField(verbose_name="Ответ", blank=True, null=True)
+
+    def __str__(self):
+        return self.title

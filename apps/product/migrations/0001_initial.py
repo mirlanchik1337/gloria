@@ -5,44 +5,139 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50, verbose_name='Название категории')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=50, verbose_name="Название категории"),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Subcategory',
+            name="Subcategory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=50, verbose_name='Название подкатегории')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        max_length=50, verbose_name="Название подкатегории"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Product',
+            name="Product",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100, unique=True, verbose_name='Название товара')),
-                ('image', models.ImageField(blank=True, null=True, upload_to='', verbose_name='Картинка товара')),
-                ('price', models.IntegerField(verbose_name='Цена товара')),
-                ('discount_price', models.IntegerField(blank=True, null=True, verbose_name='Цена со скидкой')),
-                ('postcard', models.IntegerField(blank=True, default=25, null=True, verbose_name='Открытка')),
-                ('description', models.TextField(blank=True, null=True, verbose_name='Описание товара')),
-                ('is_hit', models.BooleanField(default=False, verbose_name='Хит товар')),
-                ('is_sale', models.BooleanField(default=False, verbose_name='Акционный товар')),
-                ('created', models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')),
-                ('updated', models.DateTimeField(auto_now=True, verbose_name='Дата обновления')),
-                ('quantity', models.IntegerField(blank=True, null=True, verbose_name='Кол-во товара')),
-                ('categories', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='product.category', verbose_name='Категория товара')),
-                ('subcategories', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='product.subcategory', verbose_name='Подкатегория товара')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        max_length=100, unique=True, verbose_name="Название товара"
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        upload_to="",
+                        verbose_name="Картинка товара",
+                    ),
+                ),
+                ("price", models.IntegerField(verbose_name="Цена товара")),
+                (
+                    "discount_price",
+                    models.IntegerField(
+                        blank=True, null=True, verbose_name="Цена со скидкой"
+                    ),
+                ),
+                (
+                    "postcard",
+                    models.IntegerField(
+                        blank=True, default=25, null=True, verbose_name="Открытка"
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True, null=True, verbose_name="Описание товара"
+                    ),
+                ),
+                (
+                    "is_hit",
+                    models.BooleanField(default=False, verbose_name="Хит товар"),
+                ),
+                (
+                    "is_sale",
+                    models.BooleanField(default=False, verbose_name="Акционный товар"),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Дата создания"
+                    ),
+                ),
+                (
+                    "updated",
+                    models.DateTimeField(auto_now=True, verbose_name="Дата обновления"),
+                ),
+                (
+                    "quantity",
+                    models.IntegerField(
+                        blank=True, null=True, verbose_name="Кол-во товара"
+                    ),
+                ),
+                (
+                    "categories",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="product.category",
+                        verbose_name="Категория товара",
+                    ),
+                ),
+                (
+                    "subcategories",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="product.subcategory",
+                        verbose_name="Подкатегория товара",
+                    ),
+                ),
             ],
         ),
     ]
