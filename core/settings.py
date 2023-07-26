@@ -32,7 +32,8 @@ DJANGO_APPS = [
 LIBRARY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
-    
+    'jazzmin',
+    'django_filters',
 ]
 LOCAL_APPS = [
     'apps.product',
