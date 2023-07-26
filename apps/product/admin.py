@@ -1,4 +1,4 @@
-from apps.product.models import (Product, Category, Subcategory)
+from apps.product.models import (Product, Category, Subcategory, Review)
 from django.contrib import admin
 
 
@@ -19,3 +19,5 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category)
 admin.site.register(Subcategory)
+admin.site.register(Review)
+

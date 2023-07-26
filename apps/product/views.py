@@ -1,7 +1,8 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from .models import (Product, Category, Subcategory)
-from .serializers import (ProductSerializer, CategorySerializer, SubcategorySerializer)
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from .models import (Product, Category, Subcategory, Review)
+from .serializers import (ProductSerializer, CategorySerializer, SubcategorySerializer, ReviewSerializer)
+from rest_framework.permissions import IsAuthenticated
+
 
 
 class ProductViewSet(ReadOnlyModelViewSet):
@@ -22,5 +23,11 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 class SubcategoryViewSet(ReadOnlyModelViewSet):
     queryset = Subcategory.objects.all()
     serializer_class = SubcategorySerializer
+
+
+class ReviewViewSet(ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = IsAuthenticated,
 
 
