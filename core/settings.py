@@ -20,6 +20,7 @@ ALLOWED_HOSTS = []
 
 
 DJANGO_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -30,7 +31,7 @@ DJANGO_APPS = [
 LIBRARY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
-    'jazzmin',
+    
 ]
 LOCAL_APPS = [
     'apps.product',
@@ -134,6 +135,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
@@ -141,3 +143,15 @@ MEDIA_ROOT = BASE_DIR / 'media/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Gloria",
+    "site_header": "Gloria",
+    "site_brand": "Gloria",
+    "site_logo": "logo/746.jpg",
+    "login_logo": "logo/login.jpeg",
+    "site_logo_classes": "img-circle",
+    "welcome_sign": "Добро пожаловать на админ панель сайта Gloria",
+    "copyright": "Gloria",
+    "search_model": ["product.Product"],
+}
