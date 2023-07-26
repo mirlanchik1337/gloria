@@ -1,11 +1,21 @@
 from django.db import models
 from django.contrib.auth.models import User
+import pytils
 
 
 class Category(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название категории')
+    image = models.ImageField(help_text="Загрузите картинку для категории",
+                              blank=True, null=True)
+    category_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
+                                     help_text="Перед вводом названия категории очистите это поле")
+
+    def save(self, *args, **kwargs):
+        self.category_slug = pytils.translit.slugify(self.name)
+        super(Category, self).save(*args, **kwargs)
 
     class Meta:
+        ordering = ('name',)
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
@@ -14,21 +24,30 @@ class Category(models.Model):
 
 
 class Subcategory(models.Model):
-    title = models.CharField(max_length=50, verbose_name='Название подкатегории')
-
+    name = models.CharField(max_length=50, verbose_name='Название подкатегории')
+    image = models.ImageField(help_text="Загрузите картинку для категории",
+                              blank=True, null=True)
+    subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
+                                     help_text="Перед вводом названия категории очистите это поле")
     class Meta:
         verbose_name = "Подкатегория"
         verbose_name_plural = "Подкатегории"
 
     def __str__(self):
-        return self.title
+        return self.name
 
+    def save(self, *args, **kwargs):
+        self.subcategory_slug = pytils.translit.slugify(self.name)
+        super(Subcategory, self).save(*args, **kwargs)
 
 class Product(models.Model):
-    title = models.CharField(max_length=100, unique=True, verbose_name='Название товара')
+    name = models.CharField(max_length=100, unique=True, verbose_name='Название товара', db_index=True)
+    product_slug = models.SlugField(max_length=100, db_index=True, unique=True, verbose_name='URl', default='',
+                                    help_text="Перед вводом названия продукта очистите это поле")
     image = models.ImageField(verbose_name='Картинка товара', null=True, blank=True)
-    price = models.IntegerField(verbose_name='Цена товара')
-    discount_price = models.IntegerField(verbose_name='Цена со скидкой', blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену")
+    discount_price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Цена со скидкой', null=False,
+                                         blank=True, default=0)
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
     is_sale = models.BooleanField(default=False, verbose_name='Акционный товар')
@@ -40,11 +59,17 @@ class Product(models.Model):
                                       null=True, blank=True)
 
     class Meta:
+        ordering = ('name', 'product_slug')
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
+        index_together = (('id', 'product_slug'),)
 
     def __str__(self):
-        return self.title
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.product_slug = pytils.translit.slugify(self.name)
+        super(Product, self).save(*args, **kwargs)
 
 
 class Review(models.Model):
