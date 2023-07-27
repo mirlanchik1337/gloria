@@ -5,6 +5,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from .models import Product, Category, Subcategory, QuationsAnswers
+from .serializers import (
+    ProductSerializer,
+    CategorySerializer,
+    SubcategorySerializer,
+    QuationsAnswersSerializer,
+)
+
 
 class ProductViewSet(ReadOnlyModelViewSet):
     queryset = Product.objects.all()
@@ -34,3 +43,8 @@ class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = IsAuthenticated,
+
+
+class QuationsAnswersViewSet(ReadOnlyModelViewSet):
+    queryset = QuationsAnswers.objects.all()
+    serializer_class = QuationsAnswersSerializer

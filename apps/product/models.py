@@ -84,3 +84,11 @@ class Review(models.Model):
 
     def __str__(self):
         return f'{self.product}_{self.user}_{self.text}'
+
+
+class QuationsAnswers(models.Model):
+    title = models.TextField(verbose_name="Вопрос", blank=True, null=True)
+    description = models.TextField(verbose_name="Ответ", blank=True, null=True)
+
+    def __str__(self):
+        return self.title
