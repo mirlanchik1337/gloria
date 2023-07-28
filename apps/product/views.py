@@ -1,17 +1,15 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from .models import (Product, Category, Subcategory, Review)
-from .serializers import (ProductSerializer, CategorySerializer, SubcategorySerializer, ReviewSerializer)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from .models import Product, Category, Subcategory, QuationsAnswers
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories
 from .serializers import (
     ProductSerializer,
     CategorySerializer,
     SubcategorySerializer,
     QuationsAnswersSerializer,
+    ReviewSerializer,
+    StoriesSerializer
 )
 
 
@@ -48,3 +46,9 @@ class ReviewViewSet(ModelViewSet):
 class QuationsAnswersViewSet(ReadOnlyModelViewSet):
     queryset = QuationsAnswers.objects.all()
     serializer_class = QuationsAnswersSerializer
+
+
+class StoriesViewSet(ReadOnlyModelViewSet):
+    queryset = Stories.objects.all()
+    serializer_class = StoriesSerializer
+

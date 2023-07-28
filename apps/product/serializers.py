@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import Product, Category, Subcategory, QuationsAnswers,  Review
-
-
+from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories
 
 
 class CategorySerializer(ModelSerializer):
@@ -26,14 +24,20 @@ class SubcategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
 
+
 class QuationsAnswersSerializer(ModelSerializer):
     class Meta:
         model = QuationsAnswers
         fields = "__all__"
+
+
+class StoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stories
+        fields = '__all__'
 

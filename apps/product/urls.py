@@ -13,6 +13,7 @@ from apps.product.views import (
     CategoryViewSet,
     SubcategoryViewSet,
     QuationsAnswersViewSet,
+    StoriesViewSet
 )
 
 router = DefaultRouter()
@@ -20,8 +21,8 @@ router = DefaultRouter()
     router.register(r"products", ProductViewSet, basename="product"),
     router.register(r"categories", CategoryViewSet, basename="category"),
     router.register(r"subcategories", SubcategoryViewSet, basename="subcategory"),
-    router.register(r"quationsanswers", QuationsAnswersViewSet, basename="quationsanswers"
-    ),
+    router.register(r"quationsanswers", QuationsAnswersViewSet, basename="quationsanswers"),
+    router.register(r'stories', StoriesViewSet, basename='stories')
 )
 
 urlpatterns = router.urls

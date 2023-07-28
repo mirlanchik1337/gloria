@@ -1,6 +1,6 @@
-from apps.product.models import (Product, Category, Subcategory, Review)
-from apps.product.models import Product, Category, Subcategory, QuationsAnswers
+from apps.product.models import Product, Category, Subcategory, QuationsAnswers, Review, Stories
 from django.contrib import admin
+
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'description', 'is_hit', 'is_sale', 'categories')
@@ -42,3 +42,4 @@ admin.site.register(Category, CategoryAdmin)
 admin.site.register(Subcategory, SubcategoryAdmin)
 admin.site.register(Review)
 admin.site.register(QuationsAnswers)
+admin.site.register(Stories)

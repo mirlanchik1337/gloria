@@ -28,7 +28,8 @@ class Subcategory(models.Model):
     image = models.ImageField(help_text="Загрузите картинку для категории",
                               blank=True, null=True)
     subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
-                                     help_text="Перед вводом названия категории очистите это поле")
+                                        help_text="Перед вводом названия категории очистите это поле")
+
     class Meta:
         verbose_name = "Подкатегория"
         verbose_name_plural = "Подкатегории"
@@ -39,6 +40,7 @@ class Subcategory(models.Model):
     def save(self, *args, **kwargs):
         self.subcategory_slug = pytils.translit.slugify(self.name)
         super(Subcategory, self).save(*args, **kwargs)
+
 
 class Product(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='Название товара', db_index=True)
@@ -54,7 +56,7 @@ class Product(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара')
-    categories = models.ForeignKey(Category, on_delete=models.CASCADE,  verbose_name='Категория товара')
+    categories = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товара')
     subcategories = models.ForeignKey(Subcategory, on_delete=models.CASCADE, verbose_name='Подкатегория товара',
                                       null=True, blank=True)
 
@@ -90,5 +92,20 @@ class QuationsAnswers(models.Model):
     title = models.TextField(verbose_name="Вопрос", blank=True, null=True)
     description = models.TextField(verbose_name="Ответ", blank=True, null=True)
 
+    class Meta:
+        verbose_name = "Вопросы-Ответы"
+        verbose_name_plural = "Вопросы-Ответы"
+
     def __str__(self):
         return self.title
+
+
+class Stories(models.Model):
+    image = models.ImageField(default='static/gloria.jpg')
+    created_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        verbose_name = "История"
+        verbose_name_plural = "Истории"
+
+    def __str__(self):
+        return f'{self.created_at}'

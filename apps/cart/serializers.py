@@ -11,6 +11,8 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = FavoriteProduct
         fields = '__all__'
+

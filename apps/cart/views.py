@@ -1,4 +1,7 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
+from rest_framework.filters import SearchFilter
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import CartItem, FavoriteProduct
@@ -25,3 +28,13 @@ class CartItemDetailView(generics.RetrieveDestroyAPIView):
 class FavoriteCreateView(generics.CreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
+    permission_classes = IsAuthenticated,
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    search_fields = ['product', ]
+
+    def delete(self, request, *args, **kwargs):
+        favorite_items = self.get_queryset()
+        favorite_items.delete()
+        return Response(
+            {"message": "Избранные были успешно очищены."}, status=status.HTTP_200_OK
+        )
