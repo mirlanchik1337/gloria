@@ -29,9 +29,6 @@ class FavoriteCreateView(generics.CreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     permission_classes = IsAuthenticated,
-    filter_backends = (DjangoFilterBackend, SearchFilter)
-    search_fields = ['product', ]
-
     def delete(self, request, *args, **kwargs):
         favorite_items = self.get_queryset()
         favorite_items.delete()
