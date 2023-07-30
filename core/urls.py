@@ -1,10 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from core.yasg import urlpatterns_swagger
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from core.settings.yasg import urlpatterns_swagger
 
 urlpatterns = [
     path('admin/', admin.site.urls),
