@@ -19,7 +19,6 @@ sqlparse==0.4.4
 tzdata==2023.3
 uritemplate==4.1.1
 urllib3==2.0.4
-
 timedelta~=2020.12.3
 pip~=22.0.4
 setuptools~=58.1.0
