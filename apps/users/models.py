@@ -10,7 +10,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         "Телефон", validators=[PhoneValidator], unique=True, max_length=300
     )
 
-    is_active = models.BooleanField("Активен", default=True)
+    is_active = models.BooleanField("Активен", default=False)
     is_staff = models.BooleanField("Персонал", default=False)
 
     USERNAME_FIELD = "phone_number"
