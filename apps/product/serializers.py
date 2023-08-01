@@ -13,6 +13,7 @@ class ProductSerializer(serializers.ModelSerializer):
     price = serializers.FloatField(min_value=1)
     categories = CategorySerializer(many=False)
 
+
     class Meta:
         model = Product
         fields = '__all__'

@@ -12,7 +12,7 @@ from .serializers import (
     ReviewSerializer,
     StoriesSerializer
 )
-from apps.product.pagination import CustomProductPagination , CustomСategoryPagination
+from apps.product.pagination import CustomProductPagination
 
 
 class ProductViewSet(ReadOnlyModelViewSet):
@@ -29,14 +29,13 @@ class ProductViewSet(ReadOnlyModelViewSet):
     pagination_class = CustomProductPagination
 
 
+
 class CategoryViewSet(ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     lookup_field = 'category_slug'
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ['name', ]
-    pagination_class = CustomСategoryPagination
-
 
 
 class SubcategoryViewSet(ReadOnlyModelViewSet):
@@ -45,8 +44,6 @@ class SubcategoryViewSet(ReadOnlyModelViewSet):
     lookup_field = 'subcategory_slug'
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
-    pagination_class = CustomСategoryPagination
-
 
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()

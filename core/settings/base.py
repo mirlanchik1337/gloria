@@ -8,7 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config("SECRET_KEY")
 AUTH_USER_MODEL = "users.User"
 
-
 DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -58,6 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
@@ -77,11 +77,19 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-LANGUAGE_CODE = 'Ru-ru'
+LANGUAGE_CODE = 'Ru-en'
 TIME_ZONE = 'Asia/Bishkek'
 USE_I18N = True
 USE_TZ = True
+WAGTAIL_DATE_FORMAT = '%d.%m.%Y.'
+WAGTAIL_DATETIME_FORMAT = '%d.%m.%Y. %H:%M'
 
+DATETIME_INPUT_FORMATS = [
+    '%d.%m.%Y. %H:%M',
+]
+
+DATE_FORMAT = '%d.%m.%Y'
+DATETIME_FORMAT = '%d.%m.%Y. %H:%M'
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'

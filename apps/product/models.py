@@ -53,7 +53,7 @@ class Product(models.Model):
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
     is_sale = models.BooleanField(default=False, verbose_name='Акционный товар')
-    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    created = models.DateTimeField(auto_now_add=True , verbose_name='Дата создания')
     updated = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара')
     categories = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товара')
