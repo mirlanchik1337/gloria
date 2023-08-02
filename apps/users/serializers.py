@@ -45,9 +45,9 @@ class UserRegistrationSerializer(serializers.Serializer):
 
 
 class UserLoginSerializer(serializers.Serializer):
-    phone_number = serializers.CharField(required=True)
+    phone_number = serializers.CharField()
     password = serializers.CharField(
-        style={"input_type": "password"}, help_text="min length 4", min_length=4
+        # style={"input_type": "password"}, help_text="min length 4", min_length=4
     )
 
 

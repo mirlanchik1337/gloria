@@ -58,6 +58,13 @@ MIDDLEWARE = [
 ]
 
 
+REST_FRAMEWORK = {
+    "NON_FIELD_ERRORS_KEY": "errors",
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )}
+
 ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
@@ -84,9 +91,31 @@ USE_TZ = True
 WAGTAIL_DATE_FORMAT = '%d.%m.%Y.'
 WAGTAIL_DATETIME_FORMAT = '%d.%m.%Y. %H:%M'
 
+
 DATETIME_INPUT_FORMATS = [
     '%d.%m.%Y. %H:%M',
 ]
+
+# Database
+# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+#
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME':
+#         'USER':
+#         'PASSWORD':
+#         'HOST':
+#     }
+# }
 
 DATE_FORMAT = '%d.%m.%Y'
 DATETIME_FORMAT = '%d.%m.%Y. %H:%M'
