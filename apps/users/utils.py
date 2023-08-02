@@ -9,8 +9,8 @@ def generate_verification_code():
 
 def send_to_the_code_phone(phone, code):
     sms = code
-    login = "Beksultan"
-    pwd = "3_9B3yuh"
+    login = "AbdumalikBebeza"
+    pwd = "EoXkn7jQ"
     sender = "SMSPRO.KG"
     test = "1"
     xml_data = f"""<?xml version="1.0" encoding="UTF-8"?>

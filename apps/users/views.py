@@ -118,7 +118,7 @@ class UserRegistrationView(generics.CreateAPIView):
             )
             return response.Response(
                 data={
-                    "detail": "Код для подтверждения пользователя отправлен вам на номер телефона", "code": f"{code}"
+                    "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number}"
                 }
             )
         except IntegrityError:

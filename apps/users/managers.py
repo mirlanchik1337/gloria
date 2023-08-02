@@ -21,8 +21,9 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, phone_number, password):
         return self._create_user(
-            password,
             phone_number,
+            password,
+            is_active=True,
             is_staff=True,
             is_superuser=True,
         )
