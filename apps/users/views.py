@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.db import IntegrityError
 from django.contrib.auth import login, authenticate, logout, hashers
 from django.utils import timezone
+from apps.users.permissions import IsOwner
 from rest_framework import (
     status,
     generics,
@@ -185,7 +186,7 @@ class LogoutAPIView(views.APIView):
 class ProfileAPIView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.ProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsOwner]
 
     def get_queryset(self):
         user = self.request.user
@@ -196,4 +197,5 @@ class ProfileAPIView(generics.ListAPIView):
 class ProfileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.ProfileSerializer
+    permission_classes = [IsOwner]
     lookup_field = 'id'
