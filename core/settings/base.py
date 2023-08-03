@@ -22,7 +22,9 @@ LIBRARY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
-    'drf_yasg'
+    'drf_yasg',
+    "corsheaders",
+
 ]
 LOCAL_APPS = [
     'apps.product',
@@ -48,6 +50,8 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,6 +61,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "http://localhost",
+    "http://127.0.0.1:",
+    "http://localhost:8080",
+    "http://127.0.0.1",
+]
 
 REST_FRAMEWORK = {
     "NON_FIELD_ERRORS_KEY": "errors",
@@ -90,7 +102,6 @@ USE_I18N = True
 USE_TZ = True
 WAGTAIL_DATE_FORMAT = '%d.%m.%Y.'
 WAGTAIL_DATETIME_FORMAT = '%d.%m.%Y. %H:%M'
-
 
 DATETIME_INPUT_FORMATS = [
     '%d.%m.%Y. %H:%M',
@@ -140,11 +151,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
-
-
-
 
 if not PRODUCTION:
     from .development import *
