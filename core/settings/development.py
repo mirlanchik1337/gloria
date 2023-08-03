@@ -10,6 +10,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = True
 ALLOWED_HOSTS = ['*']
 
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -17,6 +18,9 @@ DATABASES = {
     }
 }
 
+CORS_ORIGIN_WRITELIST= (
+    'http://localhost',
+)
 
 
 
