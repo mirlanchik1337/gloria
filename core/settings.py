@@ -34,7 +34,13 @@ LIBRARY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
+<<<<<<< tilek:core/settings.py
     'drf_yasg'
+=======
+    'drf_yasg',
+    'corsheaders'
+
+>>>>>>> local:core/settings/base.py
 ]
 LOCAL_APPS = [
     'apps.product',
@@ -56,8 +62,25 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+<<<<<<< tilek:core/settings.py
 ]
 
+=======
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+]
+
+#
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "http://localhost",
+    "http://127.0.0.1:",
+    "http://localhost:8080",
+    "http://127.0.0.1",
+]
+
+>>>>>>> local:core/settings/base.py
 REST_FRAMEWORK = {
     "NON_FIELD_ERRORS_KEY": "errors",
     "DEFAULT_AUTHENTICATION_CLASSES": (
