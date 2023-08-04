@@ -23,7 +23,7 @@ LIBRARY_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'drf_yasg',
-    "corsheaders",
+    'corsheaders'
 ]
 LOCAL_APPS = [
     'apps.product',
