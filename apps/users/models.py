@@ -2,6 +2,7 @@ from django.db import models
 from .validators import PhoneValidator
 from .managers import UserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from .choices import GENDER_CHOICES
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -9,7 +10,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(
         "Телефон", validators=[PhoneValidator], unique=True, max_length=300
     )
-
+    date_of_birthday = models.DateField(null=True)
+    gender = models.CharField(max_length=255, choices=GENDER_CHOICES, null=True)
+    avatar = models.ImageField(null=True, upload_to='media/avatars/')
     is_active = models.BooleanField("Активен", default=False)
     is_staff = models.BooleanField("Персонал", default=False)
 

@@ -50,8 +50,7 @@ class UserService(Service):
 
 class GetLoginResponseService:
     @staticmethod
-    def get_login_response(user, request):
+    def get_jwt(user):
         refresh = RefreshToken.for_user(user)
         data = {"refresh": str(refresh), "access": str(refresh.access_token)}
-        print(refresh)
         return data

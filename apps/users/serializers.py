@@ -1,3 +1,5 @@
+from abc import ABC
+
 from jsonschema.exceptions import ValidationError
 from rest_framework import serializers
 from .models import User
@@ -47,7 +49,7 @@ class UserRegistrationSerializer(serializers.Serializer):
 class UserLoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
     password = serializers.CharField(
-        # style={"input_type": "password"}, help_text="min length 4", min_length=4
+        style={"input_type": "password"}, help_text="min length 4", min_length=4
     )
 
 
@@ -56,4 +58,4 @@ class LogoutSerializer(serializers.Serializer):
 
 
 class UserConfimSerializer(serializers.Serializer):
-    code = serializers.IntegerField(required=True)
+    code = serializers.CharField(required=True)

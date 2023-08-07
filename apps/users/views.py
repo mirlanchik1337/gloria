@@ -13,6 +13,7 @@ from rest_framework import (
 from .models import User, PasswordResetToken, UserConfirm
 from . import serializers, utils
 from .services import GetLoginResponseService
+from .permissions import IsOwner
 
 
 class PasswordResetNewPasswordAPIView(generics.CreateAPIView):
@@ -164,14 +165,15 @@ class UserLoginUserAPIView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = authenticate(request=request, phone_number=serializer.validated_data.get("phone_number"),
-                            password=serializer.validated_data.get("password"))
+        user = authenticate(request=request, **serializer.validated_data)
 
         if not user:
             raise exceptions.AuthenticationFailed
         login(request, user)
         return response.Response(
-            data=GetLoginResponseService.get_login_response(user, request)
+            data={"id": user.id,
+                  "detail": GetLoginResponseService.get_login_response(user, request)
+                  }
         )
 
 
@@ -186,7 +188,7 @@ class LogoutAPIView(views.APIView):
 class ProfileAPIView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.ProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         user = self.request.user
@@ -198,3 +200,4 @@ class ProfileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.ProfileSerializer
     lookup_field = 'id'
+    permission_classes = [IsOwner]
