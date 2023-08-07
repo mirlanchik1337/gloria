@@ -172,7 +172,7 @@ class UserLoginUserAPIView(generics.CreateAPIView):
         login(request, user)
         return response.Response(
             data={"id": user.id,
-                  "detail": GetLoginResponseService.get_login_response(user, request)
+                  "detail": GetLoginResponseService.get_jwt(user=user)
                   }
         )
 

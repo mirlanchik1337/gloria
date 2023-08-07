@@ -7,7 +7,7 @@ from .models import User
 
 class PasswordResetNewPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(
-        style={"input_type": "password"}, help_text="min length 4", min_length=4
+        style={"input_type": "password"}, help_text="min length 6", min_length=6
     )
 
 
@@ -31,11 +31,7 @@ class PasswordResetSearchUserSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = (
-            "id",
-            "fullname",
-            "phone_number",
-        )
+        fields = ("__all__")
 
 
 class UserRegistrationSerializer(serializers.Serializer):
@@ -49,7 +45,7 @@ class UserRegistrationSerializer(serializers.Serializer):
 class UserLoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField()
     password = serializers.CharField(
-        style={"input_type": "password"}, help_text="min length 4", min_length=4
+        style={"input_type": "password"}, help_text="min length 6", min_length=6
     )
 
 

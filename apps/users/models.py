@@ -33,6 +33,10 @@ class UserConfirm(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='users_code')
     code = models.CharField(max_length=6)
 
+    class Meta:
+        verbose_name = "Код Верификации"
+        verbose_name_plural = "Коды Верификации"
+
     def __str__(self):
         return f"{self.user}, {self.code}"
 
@@ -41,6 +45,10 @@ class PasswordResetToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
     time = models.DateTimeField()
+
+    class Meta:
+        verbose_name = "Сброс пароля"
+        verbose_name_plural = "Сбросы паролей"
 
     def __str__(self):
         return f"{self.user}, {self.token}"
