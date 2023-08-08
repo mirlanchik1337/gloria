@@ -29,6 +29,7 @@ class Subcategory(models.Model):
                               blank=True, null=True)
     subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
                                         help_text="Перед вводом названия категории очистите это поле")
+    categories = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория', default=1)
 
     class Meta:
         verbose_name = "Подкатегория"
@@ -53,7 +54,7 @@ class Product(models.Model):
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
     is_sale = models.BooleanField(default=False, verbose_name='Акционный товар')
-    created = models.DateTimeField(auto_now_add=True , verbose_name='Дата создания')
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара')
     categories = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товара')
@@ -103,6 +104,7 @@ class QuationsAnswers(models.Model):
 class Stories(models.Model):
     image = models.ImageField(default='static/gloria.jpg')
     created_at = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = "История"
         verbose_name_plural = "Истории"
