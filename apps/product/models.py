@@ -49,14 +49,12 @@ class Product(models.Model):
                                     help_text="Перед вводом названия продукта очистите это поле")
     image = models.ImageField(verbose_name='Картинка товара', null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену")
-    discount_price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Цена со скидкой', null=True,
-                                         blank=True, default=0)
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
     is_sale = models.BooleanField(default=False, verbose_name='Акционный товар')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
-    quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара')
+    quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара', default=0)
     categories = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товара')
     subcategories = models.ForeignKey(Subcategory, on_delete=models.CASCADE, verbose_name='Подкатегория товара',
                                       null=True, blank=True)
