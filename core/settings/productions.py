@@ -28,6 +28,20 @@ DATABASES = {
     }
 }
 
+CORS_ORIGIN_WRITELIST= (
+    'http://localhost',
+)
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:8080",
+    "http://localhost:88" "http://web:8080",
+    "http://web:80",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8080",
+]
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOWED_ORIGINS = [

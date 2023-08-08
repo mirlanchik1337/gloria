@@ -18,10 +18,18 @@ DATABASES = {
     }
 }
 
+
+
+
+CORS_ORIGIN_WRITELIST = (
+    'http://localhost:3000',
+    'http://localhost:',
+)
+
+
 # CORS_ORIGIN_WRITELIST= (
 #     'http://localhost',
 # )
-
 
 
 SIMPLE_JWT = {

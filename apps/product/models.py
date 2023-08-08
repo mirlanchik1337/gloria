@@ -109,3 +109,7 @@ class Stories(models.Model):
 
     def __str__(self):
         return f'{self.created_at}'
+
+
+class WhatsAppLink(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)

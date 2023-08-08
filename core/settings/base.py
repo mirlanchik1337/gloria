@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+
+from celery import Celery
 from decouple import config
 from core.settings.jazzmin import *
 
@@ -7,6 +9,11 @@ PRODUCTION = False
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config("SECRET_KEY")
 AUTH_USER_MODEL = "users.User"
+
+app = Celery('your_project')
+app.config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks()
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -23,8 +30,7 @@ LIBRARY_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'drf_yasg',
-    "corsheaders",
-
+    'corsheaders'
 ]
 LOCAL_APPS = [
     'apps.product',
@@ -37,6 +43,28 @@ INSTALLED_APPS = [
     *DJANGO_APPS,
     *LIBRARY_APPS,
     *LOCAL_APPS
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+]
+
+#
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "http://localhost",
+    "http://127.0.0.1:",
+    "http://localhost:8080",
+    "http://127.0.0.1",
 ]
 
 REST_FRAMEWORK = {
@@ -58,6 +86,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware'
 ]
 

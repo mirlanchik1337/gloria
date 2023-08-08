@@ -18,7 +18,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         super(User, self).save(*args, **kwargs)
 
     USERNAME_FIELD = "phone_number"
-    REQUIRED_FIELDS = []  # Необязательные поля для создания суперпользователя
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 
