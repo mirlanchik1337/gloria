@@ -5,19 +5,20 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import CartItem, FavoriteProduct
-from .serializers import CartItemSerializer, FavoriteSerializer, CartSerializer
+from .serializers import CartItemSerializer, FavoriteSerializer
 
-
-class CartItemCreateView(generics.CreateAPIView):
-    queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
 
 
 class CartItemListView(generics.ListAPIView):
     queryset = CartItem.objects.all()
-    serializer_class = CartSerializer
+    serializer_class = CartItemSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ['product__name', ]
+    permission_classes = IsAuthenticated
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
 
     def delete(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
