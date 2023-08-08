@@ -1,5 +1,3 @@
-from abc import ABC
-
 from jsonschema.exceptions import ValidationError
 from rest_framework import serializers
 from .models import User
@@ -31,14 +29,14 @@ class PasswordResetSearchUserSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("__all__")
+        fields = "fullname phone_number date_of_birthday gender avatar password".split()
 
 
 class UserRegistrationSerializer(serializers.Serializer):
     fullname = serializers.CharField(required=True)
     phone_number = serializers.CharField(required=True)
     password = serializers.CharField(
-        style={"input_type": "password"}, help_text="min length 4", min_length=4
+        style={"input_type": "password"}, help_text="min length 6", min_length=6
     )
 
 
@@ -55,3 +53,15 @@ class LogoutSerializer(serializers.Serializer):
 
 class UserConfimSerializer(serializers.Serializer):
     code = serializers.CharField(required=True)
+
+
+class SetPasswordSerilizer(serializers.Serializer):
+    old_password = serializers.CharField(
+        style={"input_type": "password"}, help_text="min length 6", min_length=6
+    )
+    new_password = serializers.CharField(
+        style={"input_type": "password"}, help_text="min length 6", min_length=6
+    )
+    confirm_new_password = serializers.CharField(
+        style={"input_type": "password"}, help_text="min length 6", min_length=6
+    )
