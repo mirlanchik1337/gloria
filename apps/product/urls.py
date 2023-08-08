@@ -1,3 +1,4 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from apps.product.views import (
@@ -6,7 +7,8 @@ from apps.product.views import (
     SubcategoryViewSet,
     ReviewViewSet,
     QuationsAnswersViewSet,
-    StoriesViewSet
+    StoriesViewSet,
+    WhatsAppLinkViewSet
 )
 
 router = DefaultRouter()
@@ -16,7 +18,8 @@ router = DefaultRouter()
     router.register(r"subcategories", SubcategoryViewSet, basename="subcategory"),
     router.register(r'reviews', ReviewViewSet, basename='review'),
     router.register(r"quationsanswers", QuationsAnswersViewSet, basename="quationsanswers"),
-    router.register(r'stories', StoriesViewSet, basename='stories')
+    router.register(r'stories', StoriesViewSet, basename='stories'),
+    router.register(r'whatsapp', WhatsAppLinkViewSet, basename='whatsapp_link')
 )
 
 urlpatterns = router.urls

@@ -9,15 +9,12 @@ from .serializers import CartItemSerializer, FavoriteSerializer
 
 
 
-class CartItemListView(generics.ListAPIView):
+class CartItemListView(generics.CreateAPIView, generics.ListAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ['product__name', ]
-    permission_classes = IsAuthenticated
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
 
 
     def delete(self, request, *args, **kwargs):
@@ -36,7 +33,6 @@ class CartItemDetailView(generics.RetrieveDestroyAPIView):
 class FavoriteCreateView(generics.CreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
-    permission_classes = IsAuthenticated,
 
     def delete(self, request, *args, **kwargs):
         favorite_items = self.get_queryset()

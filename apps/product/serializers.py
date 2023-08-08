@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories
+from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink
 
 
 class CategorySerializer(ModelSerializer):
@@ -12,7 +12,6 @@ class CategorySerializer(ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     price = serializers.FloatField(min_value=1)
     categories = CategorySerializer(many=False)
-
 
     class Meta:
         model = Product
@@ -43,3 +42,9 @@ class StoriesSerializer(serializers.ModelSerializer):
         model = Stories
         fields = '__all__'
 
+
+
+class WhatsAppLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WhatsAppLink
+        fields = '__all__'
