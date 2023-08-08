@@ -1,9 +1,6 @@
-
-from apps.users.models import User
 from apps.users.models import User
 from django.db import models
 from apps.product.models import Product
-from core import settings
 
 
 class CartItem(models.Model):

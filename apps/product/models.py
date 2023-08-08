@@ -49,7 +49,7 @@ class Product(models.Model):
                                     help_text="Перед вводом названия продукта очистите это поле")
     image = models.ImageField(verbose_name='Картинка товара', null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену")
-    discount_price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Цена со скидкой', null=False,
+    discount_price = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Цена со скидкой', null=True,
                                          blank=True, default=0)
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
