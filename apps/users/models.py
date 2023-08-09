@@ -10,9 +10,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(
         "Телефон", validators=[PhoneValidator], unique=True, max_length=300
     )
-    date_of_birthday = models.DateField(null=True)
-    gender = models.CharField(max_length=255, choices=GENDER_CHOICES, null=True)
-    avatar = models.ImageField(null=True, upload_to='media/avatars/')
+    date_of_birthday = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=255, choices=GENDER_CHOICES, null=True, blank=True)
+    avatar = models.ImageField(null=True, upload_to='avatars/', blank=True)
     is_active = models.BooleanField("Активен", default=False)
     is_staff = models.BooleanField("Персонал", default=False)
 
