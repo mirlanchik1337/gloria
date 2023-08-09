@@ -34,7 +34,6 @@ class ProductViewSet(ReadOnlyModelViewSet):
     pagination_class = CustomProductPagination
 
 
-
 class CategoryViewSet(ReadOnlyModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -49,6 +48,7 @@ class SubcategoryViewSet(ReadOnlyModelViewSet):
     lookup_field = 'subcategory_slug'
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
+
 
 class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
@@ -73,6 +73,7 @@ class StoriesViewSet(ReadOnlyModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+
 class WhatsAppLinkViewSet(ReadOnlyModelViewSet):
     queryset = WhatsAppLink.objects.all()
     serializer_class = WhatsAppLinkSerializer
@@ -82,4 +83,3 @@ class WhatsAppLinkViewSet(ReadOnlyModelViewSet):
         encoded_phone_number = phone_number.replace('+', '').replace(' ', '')
         whatsapp_url = f'https://api.whatsapp.com/send?phone={encoded_phone_number}'
         return Response({'whatsapp_url': whatsapp_url})
-    

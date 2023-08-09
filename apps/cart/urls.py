@@ -1,9 +1,12 @@
 # urls.py
 from django.urls import path
-from .views import CartItemDetailView, FavoriteCreateView, CartItemListView
+from .views import FavoriteCreateSet, CartItemListSet
+from rest_framework.routers import DefaultRouter
 
-urlpatterns = [
-    path("cart/", CartItemListView.as_view(), name="cart-list"),
-    path("cart/<int:pk>/", CartItemDetailView.as_view(), name="cart-detail"),
-    path('favorite/', FavoriteCreateView.as_view(), name='add-to-favorites')
-]
+router = DefaultRouter()
+(
+    router.register(r"favorite", FavoriteCreateSet, basename="favorite"),
+    router.register(r"cart",CartItemListSet, basename="cart"),
+)
+
+urlpatterns = router.urls
