@@ -5,21 +5,31 @@ from django.utils import timezone
 from apps.users.permissions import IsOwner
 from rest_framework import (
     status,
-    generics,
+    viewsets,
     permissions,
-    views,
     exceptions,
     response,
+    views, generics
 )
-
+from .services import PostOnlyViewSet
 from .models import User, PasswordResetToken, UserConfirm
 from . import serializers, utils
 from .services import GetLoginResponseService
+from .permissions import IsOwner
 
-class PasswordResetNewPasswordAPIView(generics.CreateAPIView):
-    """API для сброса пароля"""
+from rest_framework import views, status, response
+from rest_framework.decorators import action
+from .models import PasswordResetToken
+from . import serializers
+from django.utils import timezone
+from django.contrib.auth import hashers
 
+
+class PasswordResetNewPasswordViewSet(views.APIView):
     serializer_class = serializers.PasswordResetNewPasswordSerializer
+
+    def get(self, request, *args, **kwargs):
+        return response.Response(data={"detail": "Введите новый пароль!"})
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
@@ -48,12 +58,12 @@ class PasswordResetNewPasswordAPIView(generics.CreateAPIView):
         )
 
 
-class PasswordResetTokenAPIView(generics.CreateAPIView):
-    """API для введения токена"""
+class PasswordResetTokenViewSet(PostOnlyViewSet):
+    """API для введения кода"""
 
     serializer_class = serializers.PasswordResetTokenSerializer
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
@@ -61,7 +71,7 @@ class PasswordResetTokenAPIView(generics.CreateAPIView):
                 reset_code = PasswordResetToken.objects.get(
                     token=code, time__gt=timezone.now()
                 )
-            except Exception as e:
+            except:
                 return response.Response(
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                     data={
@@ -71,12 +81,12 @@ class PasswordResetTokenAPIView(generics.CreateAPIView):
                 data={"detail": "ok", "code": f"{code}"}, status=status.HTTP_200_OK)
 
 
-class PasswordResetSearchUserAPIView(generics.CreateAPIView):
+class PasswordResetSearchUserViewSet(PostOnlyViewSet):
     """API для поиска user и создание кода"""
 
     serializer_class = serializers.PasswordResetSearchUserSerializer
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
@@ -99,16 +109,18 @@ class PasswordResetSearchUserAPIView(generics.CreateAPIView):
             print(code)
 
             return response.Response(
-                data={"detail": "Сообщение отправлено вам на номер телефона!", "code": f"{code}"},
+                data={"detail": f"Сообщение отправлено вам на номер телефона! {user.phone_number}"
+                                f"code - {code}"},
                 status=status.HTTP_200_OK,
             )
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserRegistrationView(generics.CreateAPIView):
+class UserRegistrationViewSet(PostOnlyViewSet):
+    queryset = User.objects.all()
     serializer_class = serializers.UserRegistrationSerializer
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
@@ -120,7 +132,8 @@ class UserRegistrationView(generics.CreateAPIView):
             # )
             return response.Response(
                 data={
-                    "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number},code {activate_code}"
+                    "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number} "
+                              f"code - {activate_code}"
                 }
             )
         except IntegrityError:
@@ -129,10 +142,10 @@ class UserRegistrationView(generics.CreateAPIView):
             )
 
 
-class UserConfirmAPIView(generics.CreateAPIView):
+class UserConfirmViewSet(PostOnlyViewSet):
     serializer_class = serializers.UserConfimSerializer
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -158,24 +171,25 @@ class UserConfirmAPIView(generics.CreateAPIView):
             )
 
 
-class UserLoginUserAPIView(generics.CreateAPIView):
+class UserLoginViewSet(PostOnlyViewSet):
     serializer_class = serializers.UserLoginSerializer
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = authenticate(request=request, phone_number=serializer.validated_data.get("phone_number"),
-                            password=serializer.validated_data.get("password"))
+        user = authenticate(request=request, **serializer.validated_data)
 
         if not user:
             raise exceptions.AuthenticationFailed
         login(request, user)
         return response.Response(
-            data=GetLoginResponseService.get_login_response(user, request)
+            data={"id": user.id,
+                  "detail": GetLoginResponseService.get_jwt(user=user)
+                  }
         )
 
 
-class LogoutAPIView(views.APIView):
+class LogoutViewSet(PostOnlyViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -183,12 +197,14 @@ class LogoutAPIView(views.APIView):
         return response.Response({"detail": "Вы успешно вышли из системы."})
 
 
-class ProfileAPIView(generics.ListAPIView):
+class ProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.ProfileSerializer
     permission_classes = [IsOwner]
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+    lookup_field = 'id'
 
-    def get_queryset(self):
+    def list(self):
         user = self.request.user
         queryset = User.objects.filter(id=user.id)
         return queryset
@@ -199,3 +215,28 @@ class ProfileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.ProfileSerializer
     permission_classes = [IsOwner]
     lookup_field = 'id'
+
+class SetPassword(views.APIView):
+    serializer_class = serializers.SetPasswordSerilizer
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user.id
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        old_password = serializer.validated_data['old_password']
+        new_password = serializer.validated_data['new_password']
+        confirm_new_password = serializer.validated_data['confirm_new_password']
+        try:
+            user = User.objects.get(id=user)
+        except:
+            return response.Response(
+                data={"error": "Неправильный Пароль"})
+
+        if new_password == confirm_new_password:
+            user.password = hashers.make_password(new_password)
+            user.save()
+            return response.Response(data={"detail": "Пароль изменён!"})
+
+        return response.Response(data={"Вы неправильно ввели подтверждение нового пароля"})
+

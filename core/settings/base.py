@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config("SECRET_KEY")
 AUTH_USER_MODEL = "users.User"
 
-app = Celery('your_project')
+app = Celery('gloria_backend')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
@@ -182,7 +182,31 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 if not PRODUCTION:
     from .development import *
 else:
     from .productions import *
+
+# Internationalization
+# https://docs.djangoproject.com/en/4.2/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
+STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media/'
+AUTH_USER_MODEL = "users.User"
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
