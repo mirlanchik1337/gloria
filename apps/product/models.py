@@ -25,10 +25,10 @@ class Category(models.Model):
 
 class Subcategory(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название подкатегории')
-    image = models.ImageField(help_text="Загрузите картинку для категории",
+    image = models.ImageField(help_text="Загрузите картинку для подкатегории",
                               blank=True, null=True)
     subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
-                                        help_text="Перед вводом названия категории очистите это поле")
+                                        help_text="Перед вводом названия подкатегории очистите это поле")
     categories = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория', default=1)
 
     class Meta:
@@ -43,24 +43,49 @@ class Subcategory(models.Model):
         super(Subcategory, self).save(*args, **kwargs)
 
 
+class SecondSubcategory(models.Model):
+    name = models.CharField(max_length=50, verbose_name='Название второй подкатегории')
+    image = models.ImageField(help_text="Загрузите картинку для подподкатегории",
+                              blank=True, null=True)
+    second_subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
+                                        help_text="Перед вводом названия второй подкатегории очистите это поле")
+    categories = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
+    subcategories = models.ForeignKey('Subcategory', on_delete=models.CASCADE, verbose_name='Подкатегория')
+
+    class Meta:
+        verbose_name = "Вторая Подкатегория"
+        verbose_name_plural = "Вторые Подкатегории"
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.second_subcategory_slug = pytils.translit.slugify(self.name)
+        super(SecondSubcategory, self).save(*args, **kwargs)
+
+
 class Product(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='Название товара', db_index=True)
     product_slug = models.SlugField(max_length=100, db_index=True, unique=True, verbose_name='URl', default='',
                                     help_text="Перед вводом названия продукта очистите это поле")
-    image = models.ImageField(verbose_name='Картинка товара', null=True, blank=True)
+    image_1 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №1', null=True, blank=True)
+    image_2 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №2', null=True, blank=True)
+    image_3 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №3', null=True, blank=True)
+    image_4 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №4', null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену")
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
-    is_sale = models.BooleanField(default=False, verbose_name='Акционный товар')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
     quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара', default=0)
     categories = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товара')
     subcategories = models.ForeignKey(Subcategory, on_delete=models.CASCADE, verbose_name='Подкатегория товара',
                                       null=True, blank=True)
+    second_subcategories = models.ForeignKey(SecondSubcategory, on_delete=models.CASCADE,
+                                             verbose_name='Вторая подкатегория товара', null=True, blank=True)
 
     class Meta:
-        ordering = ('name', 'product_slug')
+        ordering = ('id', 'name', 'product_slug')
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
         index_together = (('id', 'product_slug'),)

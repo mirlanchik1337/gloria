@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink
+from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink, SecondSubcategory
 
 
 class CategorySerializer(ModelSerializer):
@@ -17,10 +17,20 @@ class SubcategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class SecondSubcategorySerializer(serializers.ModelSerializer):
+    categories = CategorySerializer(many=False)
+    subcategories = SubcategorySerializer(many=False)
+
+    class Meta:
+        model = SecondSubcategory
+        fields = "__all__"
+
+
 class ProductSerializer(serializers.ModelSerializer):
     price = serializers.FloatField(min_value=1)
     categories = CategorySerializer(many=False)
     subcategories = SubcategorySerializer(many=False)
+    second_subcategories = SecondSubcategorySerializer(many=False)
 
     class Meta:
         model = Product
