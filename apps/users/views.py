@@ -1,13 +1,15 @@
+from django.shortcuts import render
 from django.db import IntegrityError
 from django.contrib.auth import login, authenticate, logout, hashers
 from django.utils import timezone
+from apps.users.permissions import IsOwner
 from rest_framework import (
     status,
     viewsets,
     permissions,
     exceptions,
     response,
-    views
+    views, generics
 )
 from .services import PostOnlyViewSet
 from .models import User, PasswordResetToken, UserConfirm
@@ -15,10 +17,18 @@ from . import serializers, utils
 from .services import GetLoginResponseService
 from .permissions import IsOwner
 
+from rest_framework import views, status, response
+from rest_framework.decorators import action
+from .models import PasswordResetToken
+from . import serializers
+from django.utils import timezone
+from django.contrib.auth import hashers
 
-class PasswordResetNewPasswordViewSet(views.APIView):
-    """API для сброса пароля"""
+
+class PasswordResetNewPasswordViewSet(PostOnlyViewSet):
+    queryset = UserConfirm.objects.all()
     serializer_class = serializers.PasswordResetNewPasswordSerializer
+    lookup_field = 'code'
 
     def get(self, request, *args, **kwargs):
         return response.Response(data={"detail": "Введите новый пароль!"})
@@ -198,8 +208,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def list(self):
         user = self.request.user
         queryset = User.objects.filter(id=user.id)
-
         return queryset
+
+
+class ProfileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.ProfileSerializer
+    permission_classes = [IsOwner]
+    lookup_field = 'id'
 
 
 class SetPassword(views.APIView):
@@ -215,13 +231,12 @@ class SetPassword(views.APIView):
         confirm_new_password = serializer.validated_data['confirm_new_password']
         try:
             user = User.objects.get(id=user)
-        except:
+            if new_password == confirm_new_password:
+                user.password = hashers.make_password(new_password)
+                user.save()
+                return response.Response(data={"success": "Пароль изменён!"})
+        except User.DoesNotExist:
             return response.Response(
                 data={"error": "Неправильный Пароль"})
-
-        if new_password == confirm_new_password:
-            user.password = hashers.make_password(new_password)
-            user.save()
-            return response.Response(data={"detail": "Пароль изменён!"})
 
         return response.Response(data={"Вы неправильно ввели подтверждение нового пароля"})

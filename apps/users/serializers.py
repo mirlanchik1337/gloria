@@ -29,7 +29,7 @@ class PasswordResetSearchUserSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = "fullname phone_number date_of_birthday gender avatar".split()
+        fields = "fullname phone_number date_of_birthday gender avatar last_name".split()
 
 
 class UserRegistrationSerializer(serializers.Serializer):

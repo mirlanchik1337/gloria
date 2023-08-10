@@ -1,23 +1,28 @@
 from django.db import models
 from .validators import PhoneValidator
 from .managers import UserManager
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Permission, Group
 from .choices import GENDER_CHOICES
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    fullname = models.CharField("Фио", max_length=100)
+    fullname = models.CharField("Имя", max_length=40)
     phone_number = models.CharField(
-        "Телефон", validators=[PhoneValidator], unique=True, max_length=300
+        "Телефон", validators=[PhoneValidator], unique=True, max_length=15
     )
+    last_name = models.CharField(max_length=40, null=True, blank=True)
     date_of_birthday = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=255, choices=GENDER_CHOICES, null=True, blank=True)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, null=True, blank=True)
     avatar = models.ImageField(null=True, upload_to='avatars/', blank=True)
     is_active = models.BooleanField("Активен", default=False)
     is_staff = models.BooleanField("Персонал", default=False)
 
+    def save(self, *args, **kwargs):
+        self.username = self.fullname.strip().lower()
+        super(User, self).save(*args, **kwargs)
+
     USERNAME_FIELD = "phone_number"
-    REQUIRED_FIELDS = []  # Необязательные поля для создания суперпользователя
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 
@@ -43,7 +48,7 @@ class UserConfirm(models.Model):
 
 class PasswordResetToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=255)
+    token = models.CharField(max_length=6)
     time = models.DateTimeField()
 
     class Meta:
