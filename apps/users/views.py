@@ -16,9 +16,7 @@ from .models import User, PasswordResetToken, UserConfirm
 from . import serializers, utils
 from .services import GetLoginResponseService
 from .permissions import IsOwner
-
 from rest_framework import views, status, response
-from rest_framework.decorators import action
 from .models import PasswordResetToken
 from . import serializers
 from django.utils import timezone
@@ -30,7 +28,7 @@ class PasswordResetNewPasswordViewSet(PostOnlyViewSet):
     serializer_class = serializers.PasswordResetNewPasswordSerializer
     lookup_field = 'code'
 
-    def get(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         return response.Response(data={"detail": "Введите новый пароль!"})
 
     def post(self, request, *args, **kwargs):
@@ -134,13 +132,15 @@ class UserRegistrationViewSet(PostOnlyViewSet):
             # )
             return response.Response(
                 data={
-                    "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number} "
-                              f"code - {activate_code}"
+                    "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number}",
+                    "code": activate_code,
+                    f"user_id": user.id
                 }
             )
         except IntegrityError:
             return response.Response(
-                data={"detail": "Пользователь с данным номером телефона существует!"}
+                data={"detail": "Пользователь с данным номером телефона существует!"},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
 
