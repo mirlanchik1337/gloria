@@ -8,14 +8,14 @@ from apps.product import filters as filtration
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink
+from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink, SecondSubcategory
 from .serializers import (
     ProductSerializer,
     CategorySerializer,
     SubcategorySerializer,
     QuationsAnswersSerializer,
     ReviewSerializer,
-    StoriesSerializer, WhatsAppLinkSerializer
+    StoriesSerializer, WhatsAppLinkSerializer, SecondSubcategorySerializer
 )
 from apps.product.pagination import CustomProductPagination
 
@@ -46,6 +46,14 @@ class SubcategoryViewSet(ReadOnlyModelViewSet):
     queryset = Subcategory.objects.all()
     serializer_class = SubcategorySerializer
     lookup_field = 'subcategory_slug'
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    search_fields = ('name',)
+
+
+class SecondSubcategoryViewSet(ReadOnlyModelViewSet):
+    queryset = SecondSubcategory.objects.all()
+    serializer_class = SecondSubcategorySerializer
+    lookup_field = 'second_subcategory_slug'
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
 
