@@ -25,8 +25,10 @@ from django.utils import timezone
 from django.contrib.auth import hashers
 
 
-class PasswordResetNewPasswordViewSet(views.APIView):
+class PasswordResetNewPasswordViewSet(PostOnlyViewSet):
+    queryset = UserConfirm.objects.all()
     serializer_class = serializers.PasswordResetNewPasswordSerializer
+    lookup_field = 'code'
 
     def get(self, request, *args, **kwargs):
         return response.Response(data={"detail": "Введите новый пароль!"})
@@ -200,7 +202,6 @@ class LogoutViewSet(PostOnlyViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.ProfileSerializer
-    permission_classes = [IsOwner]
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     lookup_field = 'id'
 
@@ -216,6 +217,7 @@ class ProfileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwner]
     lookup_field = 'id'
 
+
 class SetPassword(views.APIView):
     serializer_class = serializers.SetPasswordSerilizer
     permission_classes = [permissions.IsAuthenticated, IsOwner]
@@ -229,14 +231,12 @@ class SetPassword(views.APIView):
         confirm_new_password = serializer.validated_data['confirm_new_password']
         try:
             user = User.objects.get(id=user)
-        except:
+            if new_password == confirm_new_password:
+                user.password = hashers.make_password(new_password)
+                user.save()
+                return response.Response(data={"success": "Пароль изменён!"})
+        except User.DoesNotExist:
             return response.Response(
                 data={"error": "Неправильный Пароль"})
 
-        if new_password == confirm_new_password:
-            user.password = hashers.make_password(new_password)
-            user.save()
-            return response.Response(data={"detail": "Пароль изменён!"})
-
         return response.Response(data={"Вы неправильно ввели подтверждение нового пароля"})
-

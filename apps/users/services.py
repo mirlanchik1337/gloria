@@ -4,7 +4,7 @@ from rest_framework import viewsets, status
 from rest_framework.mixins import CreateModelMixin
 
 
-class PostOnlyViewSet(CreateModelMixin, viewsets.GenericViewSet):
+class PostOnlyViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED, data={"detail": "METHOD NOT ALLOWED"})
 

@@ -1,14 +1,11 @@
 from django.urls import path
-from rest_framework_simplejwt.views import (
-    TokenVerifyView,
-    TokenObtainPairView,
-    TokenRefreshView,
-)
-from . import views
 from rest_framework.routers import DefaultRouter
-from .ruters import MyRouter
+
+from . import views
+
+
 router = DefaultRouter()
-# my_router = MyRouter()
+
 # регистрация
 router.register(r"register", views.UserRegistrationViewSet,
                 basename='register')
@@ -28,8 +25,8 @@ router.register(r"reset-password-phone-number", views.PasswordResetSearchUserVie
 router.register(r"reset-password-code", views.PasswordResetTokenViewSet,
                 basename="reset-password-code")
 # создание нового пароля + code
-# router.register(r"reset-new-password/<int:token>", views.PasswordResetNewPasswordViewSet,
-#                 basename="reset-new-password-with-code")
+router.register(r"reset-new-password", views.PasswordResetNewPasswordViewSet,
+                basename="reset-new-password-with-code")
 # профиль
 router.register(r"profile", views.ProfileViewSet,
                 basename="profile")
@@ -61,9 +58,9 @@ urlpatterns = [
     # path("profile/", views.ProfileAPIView.as_view(), name="profile-list"),
     # path("profile/<str:id>/", views.ProfileDetailAPIView.as_view(), name="profile-update,delete"),
     #
-    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    # path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    # path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    # path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     *router.urls,
     # path("register/", views.UserRegistrationView.as_view(), name="user-registration"),
     # path("login/", views.UserLoginUserAPIView.as_view(), name="user-authorization"),
@@ -82,6 +79,12 @@ urlpatterns = [
     #     name="code",
     # ),
     # # создание нового пароля + code
+    # path(
+    #     "reset-new-password/< int:code>/",
+    #     views.PasswordResetNewPasswordViewSet.as_view(),
+    #     name="new-password",
+    # ),
+    path("set-password/", views.SetPassword.as_view())
     # path(
     #     "reset-new-password/<int:code>/",
     #     views.PasswordResetNewPasswordViewSet.as_view(),
