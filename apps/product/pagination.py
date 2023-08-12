@@ -9,5 +9,5 @@ class CustomProductPagination(PageNumberPagination):
 
 
 class CustomProductCursorPagination(CursorPagination):
-    page_size = 3
+    page_size = 12
     ordering = 'id'
