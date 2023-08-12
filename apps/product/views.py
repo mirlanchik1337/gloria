@@ -18,7 +18,7 @@ from .serializers import (
     ReviewSerializer,
     StoriesSerializer, WhatsAppLinkSerializer, SecondSubcategorySerializer, PostCardSerializer, TitleOnBallSerializer
 )
-from apps.product.pagination import CustomProductPagination
+from apps.product.pagination import CustomProductPagination, CustomProductCursorPagination
 
 
 class ProductViewSet(ReadOnlyModelViewSet):
@@ -31,8 +31,9 @@ class ProductViewSet(ReadOnlyModelViewSet):
         'name', 'category', 'subcategory', 'price', 'quantity'
     ]
     search_fields = ['name']
-    ordering_fields = ['price']
-    pagination_class = CustomProductPagination
+    ordering = ['id']
+    ordering_fields = ['name']
+    pagination_class = CustomProductCursorPagination
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
