@@ -16,19 +16,19 @@ from .models import User, PasswordResetToken, UserConfirm
 from . import serializers, utils
 from .services import GetLoginResponseService
 from .permissions import IsOwner
-
 from rest_framework import views, status, response
-from rest_framework.decorators import action
 from .models import PasswordResetToken
 from . import serializers
 from django.utils import timezone
 from django.contrib.auth import hashers
 
 
-class PasswordResetNewPasswordViewSet(views.APIView):
+class PasswordResetNewPasswordViewSet(PostOnlyViewSet):
+    queryset = UserConfirm.objects.all()
     serializer_class = serializers.PasswordResetNewPasswordSerializer
+    lookup_field = 'code'
 
-    def get(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         return response.Response(data={"detail": "Введите новый пароль!"})
 
     def post(self, request, *args, **kwargs):
@@ -132,13 +132,15 @@ class UserRegistrationViewSet(PostOnlyViewSet):
             # )
             return response.Response(
                 data={
-                    "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number} "
-                              f"code - {activate_code}"
+                    "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number}",
+                    "code": activate_code,
+                    f"user_id": user.id
                 }
             )
         except IntegrityError:
             return response.Response(
-                data={"detail": "Пользователь с данным номером телефона существует!"}
+                data={"detail": "Пользователь с данным номером телефона существует!"},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
 
@@ -200,7 +202,6 @@ class LogoutViewSet(PostOnlyViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.ProfileSerializer
-    permission_classes = [IsOwner]
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     lookup_field = 'id'
 
@@ -216,6 +217,7 @@ class ProfileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwner]
     lookup_field = 'id'
 
+
 class SetPassword(views.APIView):
     serializer_class = serializers.SetPasswordSerilizer
     permission_classes = [permissions.IsAuthenticated, IsOwner]
@@ -229,14 +231,12 @@ class SetPassword(views.APIView):
         confirm_new_password = serializer.validated_data['confirm_new_password']
         try:
             user = User.objects.get(id=user)
-        except:
+            if new_password == confirm_new_password:
+                user.password = hashers.make_password(new_password)
+                user.save()
+                return response.Response(data={"success": "Пароль изменён!"})
+        except User.DoesNotExist:
             return response.Response(
                 data={"error": "Неправильный Пароль"})
 
-        if new_password == confirm_new_password:
-            user.password = hashers.make_password(new_password)
-            user.save()
-            return response.Response(data={"detail": "Пароль изменён!"})
-
         return response.Response(data={"Вы неправильно ввели подтверждение нового пароля"})
-

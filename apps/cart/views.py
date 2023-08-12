@@ -4,9 +4,8 @@ from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .models import CartItem, FavoriteProduct
-from .serializers import CartItemSerializer, FavoriteSerializer
-
+from .models import CartItem, FavoriteProduct, Banners
+from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerializer
 
 
 class CartItemListSet(viewsets.ModelViewSet):
@@ -14,6 +13,7 @@ class CartItemListSet(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ['product__name', ]
+
     def destroy(self, request, *args, **kwargs):
         if 'pk' in kwargs:
             try:
@@ -35,6 +35,7 @@ class CartItemListSet(viewsets.ModelViewSet):
                 {"message": "Корзина была успешно очищена."},
                 status=status.HTTP_200_OK
             )
+
 
 class FavoriteCreateSet(viewsets.ModelViewSet):
     queryset = FavoriteProduct.objects.all()
@@ -62,3 +63,8 @@ class FavoriteCreateSet(viewsets.ModelViewSet):
                 {"message": "Избранные были успешно очищена."},
                 status=status.HTTP_200_OK
             )
+
+
+class BannersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Banners.objects.all()
+    serializer_class = BannerSerializer

@@ -17,7 +17,6 @@ class CartItem(models.Model):
         return f'{self.product.name}'
 
 
-
 class FavoriteProduct(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -26,6 +25,18 @@ class FavoriteProduct(models.Model):
         verbose_name = "Избранное"
         verbose_name_plural = "Избранное"
 
-
     def __str__(self):
         return f'{self.product}'
+
+
+class Banners(models.Model):
+    image = models.ImageField()
+    created_at = models.DateTimeField(auto_now=True)
+    link = models.CharField(default="http://127.0.0.1:8000/api/v1/categories/", max_length=50)
+
+    def __str__(self):
+        return f'{self.image}'
+
+    class Meta:
+        verbose_name = "Баннеры"
+        verbose_name_plural = "Баннеры"
