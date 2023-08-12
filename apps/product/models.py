@@ -138,3 +138,38 @@ class Stories(models.Model):
 
 class WhatsAppLink(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class PostCardPrice(models.Model):
+    price = models.IntegerField(verbose_name='Цена открытки')
+
+    def __str__(self):
+        return f'{self.price}'
+
+
+class PostCard(models.Model):
+    text = models.CharField(max_length=100, null=True, blank=True, verbose_name='Текст на открытке для букетов')
+    is_cart = models.BooleanField(default=False, verbose_name='Добавление открытки к букету')
+    price = models.ForeignKey(PostCardPrice, on_delete=models.CASCADE, default=0, verbose_name='Цена открытки')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукт')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+
+    def __str__(self):
+        return f'{self.user}_{self.product}_{self.text}'
+
+class FontSize(models.Model):
+    size = models.IntegerField(verbose_name='Размер шрифта')
+
+    def __str__(self):
+        return f'{self.size}'
+
+
+class TitleOnBall(models.Model):
+    text = models.CharField(max_length=100, null=True, blank=True, verbose_name='Текст на шаре')
+    is_cart = models.BooleanField(default=False, verbose_name='Добавление надписи к шару')
+    size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=0, verbose_name='Размер шрифта')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукт')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+
+    def __str__(self):
+        return f'{self.user}_{self.product}_{self.text}'

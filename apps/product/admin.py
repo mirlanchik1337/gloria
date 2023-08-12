@@ -1,4 +1,5 @@
-from apps.product.models import Product, Category, Subcategory, QuationsAnswers, Review, Stories, SecondSubcategory
+from apps.product.models import (Product, Category, Subcategory, QuationsAnswers, Review, Stories, SecondSubcategory, PostCard,\
+    PostCardPrice, TitleOnBall, FontSize)
 from django.contrib import admin
 
 
@@ -50,3 +51,7 @@ admin.site.register(Review)
 admin.site.register(QuationsAnswers)
 admin.site.register(Stories)
 admin.site.register(SecondSubcategory, SecondSubcategoryAdmin)
+admin.site.register(PostCard)
+admin.site.register(PostCardPrice)
+admin.site.register(TitleOnBall)
+admin.site.register(FontSize)

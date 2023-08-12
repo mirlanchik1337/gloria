@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink, SecondSubcategory
+from .models import (Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink, SecondSubcategory, PostCard,
+                     PostCardPrice, TitleOnBall)
 
 
 class CategorySerializer(ModelSerializer):
@@ -61,3 +62,24 @@ class WhatsAppLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = WhatsAppLink
         fields = '__all__'
+
+
+class PostCardPriceSerialzier(serializers.ModelSerializer):
+    class Meta:
+        model = PostCardPrice
+        fields = '__all__'
+
+
+class PostCardSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    # product = ProductSerializer()
+    class Meta:
+        model = PostCard
+        fields = ['id', 'user', 'text', 'price', 'product']
+
+
+class TitleOnBallSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    class Meta:
+        model = TitleOnBall
+        fields = ['id', 'user', 'text', 'size', 'product']

@@ -8,14 +8,15 @@ from apps.product import filters as filtration
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from .models import Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink, SecondSubcategory
+from .models import (Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink, SecondSubcategory, PostCard,
+TitleOnBall)
 from .serializers import (
     ProductSerializer,
     CategorySerializer,
     SubcategorySerializer,
     QuationsAnswersSerializer,
     ReviewSerializer,
-    StoriesSerializer, WhatsAppLinkSerializer, SecondSubcategorySerializer
+    StoriesSerializer, WhatsAppLinkSerializer, SecondSubcategorySerializer, PostCardSerializer, TitleOnBallSerializer
 )
 from apps.product.pagination import CustomProductPagination
 
@@ -91,3 +92,14 @@ class WhatsAppLinkViewSet(ReadOnlyModelViewSet):
         encoded_phone_number = phone_number.replace('+', '').replace(' ', '')
         whatsapp_url = f'https://api.whatsapp.com/send?phone={encoded_phone_number}'
         return Response({'whatsapp_url': whatsapp_url})
+
+
+class PostCardViewSet(ModelViewSet):
+    queryset = PostCard.objects.all()
+    serializer_class = PostCardSerializer
+
+
+class TitleOnBallViewSet(ModelViewSet):
+    queryset = TitleOnBall.objects.all()
+    serializer_class = TitleOnBallSerializer
+

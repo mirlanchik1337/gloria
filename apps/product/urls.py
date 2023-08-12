@@ -9,7 +9,8 @@ from apps.product.views import (
     QuationsAnswersViewSet,
     StoriesViewSet,
     WhatsAppLinkViewSet,
-    SecondSubcategoryViewSet
+    SecondSubcategoryViewSet,
+    PostCardViewSet, TitleOnBallViewSet
 )
 
 router = DefaultRouter()
@@ -21,7 +22,9 @@ router = DefaultRouter()
     router.register(r"quationsanswers", QuationsAnswersViewSet, basename="quationsanswers"),
     router.register(r'stories', StoriesViewSet, basename='stories'),
     router.register(r'whatsapp', WhatsAppLinkViewSet, basename='whatsapp_link'),
-    router.register(r'second-subcategories', SecondSubcategoryViewSet, basename='second_subcategory')
+    router.register(r'second-subcategories', SecondSubcategoryViewSet, basename='second_subcategory'),
+    router.register(r'postcards', PostCardViewSet, basename='post_card'),
+    router.register(r'titleonballs', TitleOnBallViewSet, basename='title_on_ball')
 )
 
 urlpatterns = router.urls
