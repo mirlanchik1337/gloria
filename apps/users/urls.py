@@ -84,7 +84,6 @@ urlpatterns = [
     #     views.PasswordResetNewPasswordViewSet.as_view(),
     #     name="new-password",
     # ),
-    path("set-password/", views.SetPassword.as_view())
     # path(
     #     "reset-new-password/<int:code>/",
     #     views.PasswordResetNewPasswordViewSet.as_view(),
