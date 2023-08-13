@@ -145,6 +145,10 @@ class PostCardPrice(models.Model):
 
     def __str__(self):
         return f'{self.price}'
+    class Meta:
+        verbose_name = "Цена открыток"
+        verbose_name_plural = "Цена открыток"
+
 
 
 class PostCard(models.Model):
@@ -157,11 +161,20 @@ class PostCard(models.Model):
     def __str__(self):
         return f'{self.user}_{self.product}_{self.text}'
 
+    class Meta:
+        verbose_name = "Открытка"
+        verbose_name_plural = "Открытка"
+
+
 class FontSize(models.Model):
     size = models.IntegerField(verbose_name='Размер шрифта')
 
     def __str__(self):
         return f'{self.size}'
+
+    class Meta:
+        verbose_name = "Размеры Надписи"
+        verbose_name_plural = "Размеры Надписи"
 
 
 class TitleOnBall(models.Model):
@@ -173,3 +186,7 @@ class TitleOnBall(models.Model):
 
     def __str__(self):
         return f'{self.user}_{self.product}_{self.text}'
+
+    class Meta:
+        verbose_name = "Надпись на Шаре"
+        verbose_name_plural = "Надпись на Шаре"
