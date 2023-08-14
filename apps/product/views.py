@@ -22,7 +22,7 @@ from apps.product.serializers import (
     SecondSubcategorySerializer,
     PostCardSerializer,
     TitleOnBallSerializer)
-from apps.product.pagination import CustomProductPagination, CustomProductCursorPagination, ProductLimitOffsetPagination
+from apps.product.pagination import CustomProductPagination,  ProductLimitOffsetPagination
 
 
 class ProductViewSet(ReadOnlyModelViewSet):

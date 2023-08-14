@@ -48,7 +48,7 @@ class SecondSubcategory(models.Model):
     image = models.ImageField(help_text="Загрузите картинку для подподкатегории",
                               blank=True, null=True)
     second_subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
-                                        help_text="Перед вводом названия второй подкатегории очистите это поле")
+                                               help_text="Перед вводом названия второй подкатегории очистите это поле")
     categories = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
     subcategories = models.ForeignKey('Subcategory', on_delete=models.CASCADE, verbose_name='Подкатегория')
 
@@ -145,10 +145,10 @@ class PostCardPrice(models.Model):
 
     def __str__(self):
         return f'{self.price}'
+
     class Meta:
         verbose_name = "Цена открыток"
         verbose_name_plural = "Цена открыток"
-
 
 
 class PostCard(models.Model):

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import FavoriteProduct
 from apps.cart.models import CartItem, Banners
 from ..product.serializers import ProductSerializer
-
+from .constants import base_url , urls_media
 
 class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
@@ -29,7 +29,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_image(self, obj):
-        return f'http://127.0.0.1:8000/media/{obj.product.image_1}'
+        return f'{base_url}{urls_media}{obj.product.image_1}'
 
     def get_price(self, obj):
         return obj.product.price
@@ -51,3 +51,4 @@ class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banners
         fields = '__all__'
+

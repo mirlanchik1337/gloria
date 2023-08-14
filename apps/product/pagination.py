@@ -11,8 +11,3 @@ class CustomProductPagination(PageNumberPagination):
 class ProductLimitOffsetPagination(LimitOffsetPagination):
     default_limit = 12
     max_limit = 12
-
-
-class CustomProductCursorPagination(CursorPagination):
-    page_size = 12
-    ordering = 'id'

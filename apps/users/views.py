@@ -105,7 +105,7 @@ class PasswordResetSearchUserViewSet(PostOnlyViewSet):
             # Сохранение токена в базе данных
             password_reset_token = PasswordResetToken(user=user, token=code, time=time)
             password_reset_token.save()
-            # utils.send_to_the_code_phone(phone_number, code)
+            utils.send_to_the_code_phone(phone_number, code)
             print(code)
 
             return response.Response(
@@ -127,9 +127,10 @@ class UserRegistrationViewSet(PostOnlyViewSet):
             user = User.objects.create_user(**serializer.validated_data)
             activate_code = utils.generate_verification_code()
             code = UserConfirm.objects.create(user_id=user.id, code=activate_code)
-            # utils.send_to_the_code_phone(
-            #     serializer.validated_data["phone_number"], activate_code
-            # )
+            code.save()
+            utils.send_to_the_code_phone(
+                serializer.validated_data["phone_number"], activate_code
+            )
             return response.Response(
                 data={
                     "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number}",
