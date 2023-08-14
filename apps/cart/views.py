@@ -37,7 +37,7 @@ class CartItemListSet(viewsets.ModelViewSet):
             )
 
 
-class FavoriteCreateSet(viewsets.ModelViewSet):
+class FavoriteSet(viewsets.ModelViewSet):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     lookup_field = 'id'

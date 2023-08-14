@@ -7,3 +7,4 @@ class ProductFilters(filters.FilterSet):
     subcategories = filters.ModelChoiceFilter(queryset=Subcategory.objects.all())
     price = filters.RangeFilter(field_name='price')
     quantity = filters.RangeFilter(field_name='quantity')
+

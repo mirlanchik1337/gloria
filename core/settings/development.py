@@ -1,6 +1,5 @@
 # file for development
 import datetime
-
 from core.settings.base import *
 from decouple import config
 

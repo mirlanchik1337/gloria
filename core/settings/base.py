@@ -182,7 +182,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 if not PRODUCTION:
     from .development import *
 else:
