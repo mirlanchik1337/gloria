@@ -78,7 +78,8 @@ class PasswordResetTokenViewSet(PostOnlyViewSet):
                         "error": f"Недействительный код для сброса пароля или время истечения токена закончилось"},
                 )
             return response.Response(
-                data={"detail": "ok", "code": f"{code}"}, status=status.HTTP_200_OK)
+                data={"detail": "ok"
+                      }, status=status.HTTP_200_OK)
 
 
 class PasswordResetSearchUserViewSet(PostOnlyViewSet):
@@ -109,8 +110,7 @@ class PasswordResetSearchUserViewSet(PostOnlyViewSet):
             print(code)
 
             return response.Response(
-                data={"detail": f"Сообщение отправлено вам на номер телефона! {user.phone_number}"
-                                f"code - {code}"},
+                data={"detail": f"Сообщение отправлено вам на номер телефона! {user.phone_number}"},
                 status=status.HTTP_200_OK,
             )
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -134,7 +134,6 @@ class UserRegistrationViewSet(PostOnlyViewSet):
             return response.Response(
                 data={
                     "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number}",
-                    "code": activate_code,
                     f"user_id": user.id
                 }
             )
