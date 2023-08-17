@@ -48,7 +48,7 @@ class SecondSubcategory(models.Model):
     image = models.ImageField(help_text="Загрузите картинку для подподкатегории",
                               blank=True, null=True)
     second_subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
-                                        help_text="Перед вводом названия второй подкатегории очистите это поле")
+                                               help_text="Перед вводом названия второй подкатегории очистите это поле")
     categories = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
     subcategories = models.ForeignKey('Subcategory', on_delete=models.CASCADE, verbose_name='Подкатегория')
 
@@ -68,10 +68,6 @@ class Product(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='Название товара', db_index=True)
     product_slug = models.SlugField(max_length=100, db_index=True, unique=True, verbose_name='URl', default='',
                                     help_text="Перед вводом названия продукта очистите это поле")
-    image_1 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №1', null=True, blank=True)
-    image_2 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №2', null=True, blank=True)
-    image_3 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №3', null=True, blank=True)
-    image_4 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №4', null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену")
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
@@ -96,6 +92,11 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.product_slug = pytils.translit.slugify(self.name)
         super(Product, self).save(*args, **kwargs)
+
+
+class ImageModel(models.Model):
+    image = models.ImageField(upload_to='media/')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
 
 
 class Review(models.Model):
@@ -146,6 +147,10 @@ class PostCardPrice(models.Model):
     def __str__(self):
         return f'{self.price}'
 
+    class Meta:
+        verbose_name = "Цена открыток"
+        verbose_name_plural = "Цена открыток"
+
 
 class PostCard(models.Model):
     text = models.CharField(max_length=100, null=True, blank=True, verbose_name='Текст на открытке для букетов')
@@ -157,11 +162,20 @@ class PostCard(models.Model):
     def __str__(self):
         return f'{self.user}_{self.product}_{self.text}'
 
+    class Meta:
+        verbose_name = "Открытка"
+        verbose_name_plural = "Открытка"
+
+
 class FontSize(models.Model):
     size = models.IntegerField(verbose_name='Размер шрифта')
 
     def __str__(self):
         return f'{self.size}'
+
+    class Meta:
+        verbose_name = "Размеры Надписи"
+        verbose_name_plural = "Размеры Надписи"
 
 
 class TitleOnBall(models.Model):
@@ -173,3 +187,7 @@ class TitleOnBall(models.Model):
 
     def __str__(self):
         return f'{self.user}_{self.product}_{self.text}'
+
+    class Meta:
+        verbose_name = "Надпись на Шаре"
+        verbose_name_plural = "Надпись на Шаре"

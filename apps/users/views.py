@@ -78,7 +78,8 @@ class PasswordResetTokenViewSet(PostOnlyViewSet):
                         "error": f"Недействительный код для сброса пароля или время истечения токена закончилось"},
                 )
             return response.Response(
-                data={"detail": "ok", "code": f"{code}"}, status=status.HTTP_200_OK)
+                data={"detail": "ok"
+                      }, status=status.HTTP_200_OK)
 
 
 class PasswordResetSearchUserViewSet(PostOnlyViewSet):
@@ -105,12 +106,11 @@ class PasswordResetSearchUserViewSet(PostOnlyViewSet):
             # Сохранение токена в базе данных
             password_reset_token = PasswordResetToken(user=user, token=code, time=time)
             password_reset_token.save()
-            # utils.send_to_the_code_phone(phone_number, code)
+            utils.send_to_the_code_phone(phone_number, code)
             print(code)
 
             return response.Response(
-                data={"detail": f"Сообщение отправлено вам на номер телефона! {user.phone_number}"
-                                f"code - {code}"},
+                data={"detail": f"Сообщение отправлено вам на номер телефона! {user.phone_number}"},
                 status=status.HTTP_200_OK,
             )
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -127,13 +127,13 @@ class UserRegistrationViewSet(PostOnlyViewSet):
             user = User.objects.create_user(**serializer.validated_data)
             activate_code = utils.generate_verification_code()
             code = UserConfirm.objects.create(user_id=user.id, code=activate_code)
-            # utils.send_to_the_code_phone(
-            #     serializer.validated_data["phone_number"], activate_code
-            # )
+            code.save()
+            utils.send_to_the_code_phone(
+                serializer.validated_data["phone_number"], activate_code
+            )
             return response.Response(
                 data={
                     "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number}",
-                    "code": activate_code,
                     f"user_id": user.id
                 }
             )

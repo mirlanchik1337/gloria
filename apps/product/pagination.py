@@ -1,4 +1,4 @@
-from rest_framework.pagination import PageNumberPagination, CursorPagination
+from rest_framework.pagination import PageNumberPagination, CursorPagination, LimitOffsetPagination
 
 
 class CustomProductPagination(PageNumberPagination):
@@ -8,6 +8,6 @@ class CustomProductPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class CustomProductCursorPagination(CursorPagination):
-    page_size = 12
-    ordering = 'id'
+class ProductLimitOffsetPagination(LimitOffsetPagination):
+    default_limit = 12
+    max_limit = 12

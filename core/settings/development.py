@@ -1,13 +1,11 @@
 # file for development
 import datetime
-
 from core.settings.base import *
 from decouple import config
 
 SECRET_KEY = config("SECRET_KEY")
 
-# DEBUG = config('DEBUG')
-DEBUG = True
+DEBUG = config('DEBUG')
 ALLOWED_HOSTS = ['*']
 
 

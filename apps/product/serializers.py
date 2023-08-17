@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from .models import (Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink, SecondSubcategory, PostCard,
-                     PostCardPrice, TitleOnBall)
+from .models import (Product, Category, Subcategory, QuationsAnswers, Review, Stories, WhatsAppLink, SecondSubcategory,
+                     PostCard,
+                     PostCardPrice, TitleOnBall, ImageModel)
 
 
 class CategorySerializer(ModelSerializer):
@@ -27,11 +28,18 @@ class SecondSubcategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageModel
+        fields = "id image".split()
+
+
 class ProductSerializer(serializers.ModelSerializer):
     price = serializers.FloatField(min_value=1)
     categories = CategorySerializer(many=False)
     subcategories = SubcategorySerializer(many=False)
     second_subcategories = SecondSubcategorySerializer(many=False)
+    product_images = ProductImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -40,6 +48,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Review
         fields = '__all__'
@@ -57,7 +66,6 @@ class StoriesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class WhatsAppLinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = WhatsAppLink
@@ -72,6 +80,7 @@ class PostCardPriceSerialzier(serializers.ModelSerializer):
 
 class PostCardSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     # product = ProductSerializer()
     class Meta:
         model = PostCard
@@ -80,6 +89,7 @@ class PostCardSerializer(serializers.ModelSerializer):
 
 class TitleOnBallSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = TitleOnBall
         fields = ['id', 'user', 'text', 'size', 'product']
