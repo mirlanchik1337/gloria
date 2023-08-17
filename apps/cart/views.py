@@ -15,27 +15,9 @@ class CartItemListSet(viewsets.ModelViewSet):
     search_fields = ['product__name', ]
 
     def destroy(self, request, *args, **kwargs):
-        if 'pk' in kwargs:
-            try:
-                cart_item = self.get_queryset().get(pk=kwargs['pk'])
-                cart_item.delete()
-                return Response(
-                    {"message": "Товар был успешно удален из корзины."},
-                    status=status.HTTP_204_NO_CONTENT
-                )
-            except CartItem.DoesNotExist:
-                return Response(
-                    {"message": "Товар не найден в корзине."},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-        else:
-            cart_items = self.get_queryset()
-            cart_items.delete()
-            return Response(
-                {"message": "Корзина была успешно очищена."},
-                status=status.HTTP_200_OK
-            )
-
+        instance = self.get_queryset()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class FavoriteSet(viewsets.ModelViewSet):
     queryset = FavoriteProduct.objects.all()
