@@ -2,7 +2,8 @@ from rest_framework import serializers
 from rest_framework import serializers
 from .models import FavoriteProduct
 from apps.cart.models import CartItem, Banners
-from ..product.serializers import ProductSerializer
+from ..product.models import ImageModel
+from ..product.serializers import ProductSerializer, ProductImageSerializer
 from .constants import base_url , urls_media
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -19,7 +20,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 class FavoriteSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
+    product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     product_slug = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     is_hit = serializers.SerializerMethodField()
@@ -29,7 +30,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_image(self, obj):
-        return f'{base_url}{urls_media}{obj.product.image_1}'
+        return f'{obj.product.imag}'
 
     def get_price(self, obj):
         return obj.product.price
