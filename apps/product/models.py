@@ -94,6 +94,11 @@ class Product(models.Model):
         super(Product, self).save(*args, **kwargs)
 
 
+class ImageModel(models.Model):
+    image = models.ImageField(upload_to='media/')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
+
+
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     text = models.CharField(max_length=255, verbose_name="Комментарий")
