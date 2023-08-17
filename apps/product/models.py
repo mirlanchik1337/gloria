@@ -68,6 +68,10 @@ class Product(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='Название товара', db_index=True)
     product_slug = models.SlugField(max_length=100, db_index=True, unique=True, verbose_name='URl', default='',
                                     help_text="Перед вводом названия продукта очистите это поле")
+    image_1 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №1', null=True, blank=True)
+    image_2 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №2', null=True, blank=True)
+    image_3 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №3', null=True, blank=True)
+    image_4 = models.ImageField(verbose_name='Картинка товара', help_text='Картинка товара №4', null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену")
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
@@ -92,11 +96,6 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         self.product_slug = pytils.translit.slugify(self.name)
         super(Product, self).save(*args, **kwargs)
-
-
-class ImageModel(models.Model):
-    image = models.ImageField(upload_to='media/')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
 
 
 class Review(models.Model):

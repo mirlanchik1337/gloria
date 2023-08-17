@@ -108,4 +108,3 @@ class PostCardViewSet(ModelViewSet):
 class TitleOnBallViewSet(ModelViewSet):
     queryset = TitleOnBall.objects.all()
     serializer_class = TitleOnBallSerializer
-
