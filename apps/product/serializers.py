@@ -34,12 +34,14 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = "id image".split()
 
 
+
 class ProductSerializer(serializers.ModelSerializer):
     price = serializers.FloatField(min_value=1)
     categories = CategorySerializer(many=False)
     subcategories = SubcategorySerializer(many=False)
     second_subcategories = SecondSubcategorySerializer(many=False)
     product_images = ProductImageSerializer(many=True, read_only=True)
+
 
     class Meta:
         model = Product
@@ -93,3 +95,6 @@ class TitleOnBallSerializer(serializers.ModelSerializer):
     class Meta:
         model = TitleOnBall
         fields = ['id', 'user', 'text', 'size', 'product']
+
+
+
