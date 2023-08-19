@@ -1,13 +1,14 @@
 # urls.py
 from django.urls import path
-from .views import FavoriteSet, CartItemListSet , BannersViewSet
-from rest_framework.routers import DefaultRouter
+from .views import FavoriteItemListView, FavoriteItemDetailView, CartItemListView, CartItemDetailView ,BannersViewSet
 
-router = DefaultRouter()
-(
-    router.register(r"favorite", FavoriteSet, basename="favorite"),
-    router.register(r"cart",CartItemListSet, basename="cart"),
-    router.register(r"banners", BannersViewSet, basename='banner')
-)
 
-urlpatterns = router.urls
+
+
+urlpatterns = [
+    path('cart-items/', CartItemListView.as_view(), name='cart-item-list'),
+    path('cart-items/<int:id>/', CartItemDetailView.as_view(), name='cart-item-detail'),
+    path('favorite/', FavoriteItemListView.as_view()),
+    path('favorite/<int:id>/', FavoriteItemDetailView.as_view()),
+    path('banners/', BannersViewSet.as_view())
+]

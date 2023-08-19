@@ -33,7 +33,6 @@ class Banners(models.Model):
     image = models.ImageField()
     created_at = models.DateTimeField(auto_now=True)
     link = models.CharField(default="http://127.0.0.1:8000/api/v1/categories/", max_length=100)
-    category_id = models.CharField(f"{Category.pk}", max_length=700)
     def __str__(self):
         return f'{self.image}'
 

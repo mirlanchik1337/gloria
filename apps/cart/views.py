@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,63 +8,52 @@ from .models import CartItem, FavoriteProduct, Banners
 from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerializer
 
 
-class CartItemListSet(viewsets.ModelViewSet):
+class CartItemListView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
-    filter_backends = (DjangoFilterBackend, SearchFilter)
-    search_fields = ['product__name', ]
 
-    def destroy(self, request, *args, **kwargs):
-        if 'pk' in kwargs:
-            try:
-                cart_item = self.get_queryset().get(pk=kwargs['pk'])
-                cart_item.delete()
-                return Response(
-                    {"message": "Товар был успешно удален из корзины."},
-                    status=status.HTTP_204_NO_CONTENT
-                )
-            except CartItem.DoesNotExist:
-                return Response(
-                    {"message": "Товар не найден в корзине."},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-        else:
-            cart_items = self.get_queryset()
-            cart_items.delete()
-            return Response(
-                {"message": "Корзина была успешно очищена."},
-                status=status.HTTP_200_OK
-            )
+    def delete(self, request, *args, **kwargs):
+        # Delete all objects
+        CartItem.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class FavoriteSet(viewsets.ModelViewSet):
+class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+    lookup_field = 'id'
+
+
+class FavoriteItemListView(generics.ListCreateAPIView):
+    queryset = FavoriteProduct.objects.all()
+    serializer_class = FavoriteSerializer
+
+    def create(self, request, *args, **kwargs):
+        product_id = request.data.get('product_id')
+
+        # Check if the product is already in favorites
+        if FavoriteProduct.objects.filter(product_id=product_id).exists():
+            return Response({"detail": "Product is already in favorites."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # If not, create a new favorite
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, *args, **kwargs):
+        # Delete all favorite objects
+        FavoriteProduct.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     lookup_field = 'id'
 
-    def destroy(self, request, *args, **kwargs):
-        if 'pk' in kwargs:
-            cart_item = self.get_object()
-            if cart_item:
-                cart_item.delete()
-                return Response(
-                    {"message": "Товар был успешно удален из корзины."},
-                    status=status.HTTP_204_NO_CONTENT
-                )
-            else:
-                return Response(
-                    {"message": "Товар не найден в корзине."},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-        else:
-            cart_items = self.get_queryset()
-            cart_items.delete()
-            return Response(
-                {"message": "Корзина была успешно очищена."},
-                status=status.HTTP_200_OK
-            )
 
-
-class BannersViewSet(viewsets.ReadOnlyModelViewSet):
+class BannersViewSet(generics.ListAPIView):
     queryset = Banners.objects.all()
     serializer_class = BannerSerializer
