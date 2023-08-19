@@ -30,6 +30,8 @@ router.register(r"reset-new-password", views.PasswordResetNewPasswordViewSet,
 # профиль
 router.register(r"profile", views.ProfileViewSet,
                 basename="profile")
+router.register(r"set-password", views.SetPasswordViewSet,
+                basename="set-password")
 
 urlpatterns = [
     #
@@ -84,7 +86,7 @@ urlpatterns = [
     #     views.PasswordResetNewPasswordViewSet.as_view(),
     #     name="new-password",
     # ),
-    path("set-password/", views.SetPassword.as_view())
+    # path("set-password/", views.SetPassword.as_view())
     # path(
     #     "reset-new-password/<int:code>/",
     #     views.PasswordResetNewPasswordViewSet.as_view(),

@@ -58,6 +58,7 @@ class Product(models.Model):
     categories = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товара')
     subcategories = models.ForeignKey(Subcategory, on_delete=models.CASCADE, verbose_name='Подкатегория товара',
                                       null=True, blank=True)
+    volume = models.PositiveIntegerField(null=True)
 
     class Meta:
         ordering = ('name', 'product_slug')
@@ -113,3 +114,10 @@ class Stories(models.Model):
 
 class WhatsAppLink(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Transport(models.Model):
+    model = models.CharField(max_length=100)
+    min_volume = models.PositiveIntegerField()
+    max_volume = models.PositiveIntegerField()
+    price = models.FloatField()

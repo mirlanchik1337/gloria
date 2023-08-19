@@ -12,7 +12,6 @@ def send_to_the_code_phone(phone, code):
     login = "AbdumalikBebeza"
     pwd = "EoXkn7jQ"
     sender = "SMSPRO.KG"
-    test = "1"
     xml_data = f"""<?xml version="1.0" encoding="UTF-8"?>
                     <message>
                     <login>{login}</login>
