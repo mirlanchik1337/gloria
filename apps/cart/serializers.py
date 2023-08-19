@@ -4,13 +4,13 @@ from .models import FavoriteProduct
 from apps.cart.models import CartItem, Banners
 from ..product.models import ImageModel
 from ..product.serializers import ProductSerializer, ProductImageSerializer
-from .constants import base_url , urls_media
+from .constants import base_url, urls_media
+
 
 class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     product_slug = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
-
 
     class Meta:
         model = CartItem
@@ -24,6 +24,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     def get_id(self, obj):
         return obj.id
+
 
 class FavoriteSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
@@ -55,9 +56,15 @@ class FavoriteSerializer(serializers.ModelSerializer):
     def get_name(self, obj):
         return obj.product.name
 
+    def create(self, validated_data):
+        user = self.context['request'].user  # Get the user from the request
+        favorite, created = FavoriteProduct.objects.get_or_create(
+            user=user,
+            product=validated_data['product']  # Use the product field from the validated_data
+        )
+        return favorite
 
 class BannerSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Banners
         fields = '__all__'

@@ -17,6 +17,26 @@ class CartItemListView(generics.ListCreateAPIView):
         CartItem.objects.all().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def create(self, request, *args, **kwargs):
+        product_id = request.data.get('product')
+        user = request.user
+
+        # Check if the product already exists in the cart
+        existing_item = CartItem.objects.filter(product_id=product_id, user=user).first()
+
+        if existing_item:
+            # If the product is already in the cart, just increase the quantity
+            existing_item.quantity += 1
+            existing_item.save()
+            serializer = CartItemSerializer(existing_item)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            # If the product is not in the cart, create a new item
+            serializer = CartItemSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CartItem.objects.all()
@@ -30,16 +50,15 @@ class FavoriteItemListView(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         product_id = request.data.get('product_id')
+        user = request.user  # Assuming you have implemented user authentication
 
-        # Check if the product is already in favorites
-        if FavoriteProduct.objects.filter(product_id=product_id).exists():
+        # Check if the product is already in the user's favorites
+        if FavoriteProduct.objects.filter(user=user, product_id=product_id).exists():
             return Response({"detail": "Product is already in favorites."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # If not, create a new favorite
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-
+        serializer.save(user=user)  # Save the favorite with the user reference
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):

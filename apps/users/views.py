@@ -128,9 +128,9 @@ class UserRegistrationViewSet(PostOnlyViewSet):
             activate_code = utils.generate_verification_code()
             code = UserConfirm.objects.create(user_id=user.id, code=activate_code)
             code.save()
-            utils.send_to_the_code_phone(
-                serializer.validated_data["phone_number"], activate_code
-            )
+            # utils.send_to_the_code_phone(
+            #     serializer.validated_data["phone_number"], activate_code
+            # )
             return response.Response(
                 data={
                     "detail": f"Код для подтверждения пользователя отправлен вам на номер телефона {user.phone_number}",
