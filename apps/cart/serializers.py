@@ -9,6 +9,7 @@ from .constants import base_url, urls_media
 
 class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
+    image = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     product_slug = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
 

@@ -47,6 +47,7 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 class FavoriteItemListView(generics.ListCreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated, ]
 
     def create(self, request, *args, **kwargs):
         product_id = request.data.get('product_id')
@@ -71,6 +72,7 @@ class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     lookup_field = 'id'
+    permission_classes = [IsAuthenticated, ]
 
 
 class BannersViewSet(generics.ListAPIView):
