@@ -80,7 +80,7 @@ class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     lookup_field = 'id'
-    permission_classes = [IsAuthenticated, ]
+    # permission_classes = [IsAuthenticated, ]
 
 
 class BannersViewSet(generics.ListAPIView):

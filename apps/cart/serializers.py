@@ -33,6 +33,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField()
     is_hit = serializers.SerializerMethodField()
     quantity = serializers.SerializerMethodField()
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = FavoriteProduct
         fields = '__all__'
