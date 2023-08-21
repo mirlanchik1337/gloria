@@ -7,6 +7,7 @@ from rest_framework import status
 from .models import CartItem, FavoriteProduct, Banners
 from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerializer
 from apps.cart.permissions import IsOwnerOrReadOnly
+from ..product.models import Product
 
 
 class CartItemListView(generics.ListCreateAPIView):
@@ -52,7 +53,28 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def create(self, request, *args, **kwargs):
+        product_id = request.data.get('product_id')
 
+        if product_id is None:
+            return Response({"detail": "product_id is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(pk=product_id)
+        except Product.DoesNotExist:
+            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        cart_item_data = {
+            "product": product.id,
+            "user": request.user.id,
+            "quantity": 1  # You might want to adjust this default value
+        }
+
+        serializer = self.get_serializer(data=cart_item_data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 class FavoriteItemListView(generics.ListCreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
