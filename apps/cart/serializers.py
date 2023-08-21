@@ -10,7 +10,6 @@ from .constants import base_url, urls_media
 class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
-    product = ProductSerializer()
 
     class Meta:
         model = CartItem
@@ -19,8 +18,6 @@ class CartItemSerializer(serializers.ModelSerializer):
     def get_price(self, obj):
         return obj.product.price * obj.quantity
 
-    def get_product_slug(self, obj):
-        return obj.product.product_slug
 
     def get_id(self, obj):
         return obj.id
@@ -33,7 +30,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     product_slug = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     is_hit = serializers.SerializerMethodField()
-
+    quantity = serializers.SerializerMethodField()
     class Meta:
         model = FavoriteProduct
         fields = '__all__'
@@ -56,6 +53,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
     def get_name(self, obj):
         return obj.product.name
 
+    def get_quantity(self, obj):
+        return obj.product.quantity
     def create(self, validated_data):
         user = self.context['request'].user  # Get the user from the request
         favorite, created = FavoriteProduct.objects.get_or_create(
