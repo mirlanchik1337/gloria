@@ -6,11 +6,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import CartItem, FavoriteProduct, Banners
 from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerializer
+from apps.cart.permissions import IsOwnerOrReadOnly
 
 
 class CartItemListView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
+    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
         # Delete all objects
@@ -42,6 +47,10 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     lookup_field = 'id'
+    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class FavoriteItemListView(generics.ListCreateAPIView):

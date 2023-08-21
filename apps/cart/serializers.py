@@ -7,9 +7,11 @@ from ..product.serializers import ProductSerializer, ProductImageSerializer
 from .constants import base_url, urls_media
 
 
+
 class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = CartItem
