@@ -1,12 +1,13 @@
 from django.db import models
 from apps.users.models import User
 import pytils
+from .utils import path_and_rename, path_and_rename2, path_and_rename3, path_and_rename4
 
 
 class Category(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название категории')
     image = models.ImageField(help_text="Загрузите картинку для категории",
-                              blank=True, null=True)
+                              blank=True, null=True, upload_to=path_and_rename2)
     category_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
                                      help_text="Перед вводом названия категории очистите это поле")
 
@@ -26,7 +27,7 @@ class Category(models.Model):
 class Subcategory(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название подкатегории')
     image = models.ImageField(help_text="Загрузите картинку для подкатегории",
-                              blank=True, null=True)
+                              blank=True, null=True, upload_to=path_and_rename3)
     subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
                                         help_text="Перед вводом названия подкатегории очистите это поле")
     categories = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория', default=1)
@@ -46,7 +47,7 @@ class Subcategory(models.Model):
 class SecondSubcategory(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название второй подкатегории')
     image = models.ImageField(help_text="Загрузите картинку для подподкатегории",
-                              blank=True, null=True)
+                              blank=True, null=True, upload_to=path_and_rename4)
     second_subcategory_slug = models.SlugField(null=False, db_index=True, unique=True, verbose_name='URl', default='',
                                                help_text="Перед вводом названия второй подкатегории очистите это поле")
     categories = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name='Категория')
@@ -95,7 +96,7 @@ class Product(models.Model):
 
 
 class ImageModel(models.Model):
-    image = models.ImageField(upload_to='media/')
+    image = models.ImageField(upload_to=path_and_rename)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
 
 
