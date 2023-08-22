@@ -22,7 +22,7 @@ from apps.product.serializers import (
     SecondSubcategorySerializer,
     PostCardSerializer,
     TitleOnBallSerializer)
-from apps.product.pagination import CustomProductPagination,  ProductLimitOffsetPagination
+from apps.product.pagination import CustomProductPagination, ProductLimitOffsetPagination
 
 
 class ProductViewSet(ReadOnlyModelViewSet):
@@ -35,7 +35,7 @@ class ProductViewSet(ReadOnlyModelViewSet):
         'name', 'category',
         'subcategory', 'price',
         'quantity']
-    search_fields = ['name']
+    search_fields = ['name', 'description']
     ordering = ['id']
     ordering_fields = ['name']
     pagination_class = ProductLimitOffsetPagination

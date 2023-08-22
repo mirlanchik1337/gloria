@@ -13,7 +13,6 @@ class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     product_slug = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     is_hit = serializers.SerializerMethodField()
@@ -57,7 +56,6 @@ class FavoriteSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField()
     is_hit = serializers.SerializerMethodField()
     quantity = serializers.SerializerMethodField()
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = FavoriteProduct
