@@ -5,13 +5,20 @@ from apps.cart.models import CartItem, Banners
 from ..product.models import ImageModel
 from ..product.serializers import ProductSerializer, ProductImageSerializer
 from .constants import base_url, urls_media
+from apps.product.serializers import CategorySerializer
 
 
 
 class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    product_slug = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    is_hit = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()
+    subcategories = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
@@ -20,9 +27,26 @@ class CartItemSerializer(serializers.ModelSerializer):
     def get_price(self, obj):
         return obj.product.price * obj.quantity
 
+    def get_product_slug(self, obj):
+        return obj.product.product_slug
+
+    def get_description(self, obj):
+        return obj.product.description
+
+    def get_is_hit(self, obj):
+        return obj.product.is_hit
 
     def get_id(self, obj):
         return obj.id
+
+    def get_name(self, obj):
+        return obj.product.name
+
+    def get_categories(self, obj):
+        return obj.product.categories.id
+
+    def get_subcategories(self, obj):
+        return obj.product.subcategories.id
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -34,6 +58,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     is_hit = serializers.SerializerMethodField()
     quantity = serializers.SerializerMethodField()
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = FavoriteProduct
         fields = '__all__'
@@ -58,6 +83,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     def get_quantity(self, obj):
         return obj.product.quantity
+
     def create(self, validated_data):
         user = self.context['request'].user  # Get the user from the request
         favorite, created = FavoriteProduct.objects.get_or_create(
@@ -65,6 +91,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
             product=validated_data['product']  # Use the product field from the validated_data
         )
         return favorite
+
 
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
