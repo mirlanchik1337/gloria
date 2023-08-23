@@ -87,6 +87,9 @@ class FavoriteItemListView(generics.ListCreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
 
+    def get_queryset(self):
+        return FavoriteProduct.objects.filter(user=self.request.user)
+
     def create(self, request, *args, **kwargs):
         product_id = request.data.get('product_id')
         user = request.user  # Assuming you have implemented user authentication
@@ -110,8 +113,10 @@ class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     lookup_field = 'id'
-    # permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, ]
 
+    def get_queryset(self):
+        return FavoriteProduct.objects.filter(user=self.request.user)
 
 class BannersViewSet(generics.ListAPIView):
     queryset = Banners.objects.all()
