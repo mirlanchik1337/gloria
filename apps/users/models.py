@@ -36,7 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class UserCode(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='users_code')
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     code = models.CharField(max_length=6)
     time = models.DateTimeField()
 
@@ -46,3 +46,5 @@ class UserCode(models.Model):
 
     def __str__(self):
         return f"{self.user}, {self.code}"
+
+

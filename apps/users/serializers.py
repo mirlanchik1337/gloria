@@ -10,7 +10,6 @@ class PasswordResetNewPasswordSerializer(serializers.Serializer):
     )
 
 
-
 class PasswordResetTokenSerializer(serializers.Serializer):
     code = serializers.CharField()
 

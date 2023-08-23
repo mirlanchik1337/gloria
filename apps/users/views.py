@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import IntegrityError
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth import hashers
@@ -21,21 +22,27 @@ class PasswordResetNewPasswordViewSet(PostOnlyViewSet):
     lookup_field = 'code'
 
     def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        print(serializer)
         try:
-            new_password_service = UserServices.user_password_reset_new_password(serializer)
-            return response.Response(
-                data=new_password_service, status=status.HTTP_200_OK)
-
-        except UserCode.DoesNotExist:
-            return response.Response(
-                data={
-                    "detail": "Not Found",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+            password_reset_token = UserCode.objects.get(
+                code=request.data["code"], time__gt=timezone.now()
             )
+        except UserCode.DoesNotExist:
+            return {"detail": "Not Found"}
 
+        user = password_reset_token.user
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        password = serializer.validated_data["password"]
+
+        # Установка нового хэшированного пароля для пользователя
+        user.set_password(password)
+        user.save()
+
+        password_reset_token.delete()  # Удаление токена
+
+        return {"message": "success"}
 
 class PasswordResetTokenViewSet(PostOnlyViewSet):
     """API для введения кода"""
@@ -55,7 +62,7 @@ class PasswordResetTokenViewSet(PostOnlyViewSet):
             except UserCode.DoesNotExist:
                 return response.Response(
                     status=status.HTTP_406_NOT_ACCEPTABLE,
-                    data={"error": "Not Found"},)
+                    data={"error": "Not Found"})
 
 
 class PasswordResetSearchUserViewSet(PostOnlyViewSet):
@@ -71,7 +78,6 @@ class PasswordResetSearchUserViewSet(PostOnlyViewSet):
                 data={"message": "sended", "code": code},
                 status=status.HTTP_200_OK,
             )
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserRegistrationViewSet(PostOnlyViewSet):
