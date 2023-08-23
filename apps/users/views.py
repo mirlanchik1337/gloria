@@ -7,7 +7,8 @@ from rest_framework import (
     viewsets,
     permissions,
     exceptions,
-    response
+    response,
+    views
 )
 from .services import PostOnlyViewSet, UserServices
 from .models import User, UserCode
@@ -16,33 +17,14 @@ from .permissions import IsOwner
 from . import serializers
 
 
-class PasswordResetNewPasswordViewSet(PostOnlyViewSet):
-    queryset = UserCode.objects.all()
+class PasswordResetNewPasswordViewSet(views.APIView):
     serializer_class = serializers.PasswordResetNewPasswordSerializer
-    lookup_field = 'code'
 
-    def create(self, request, *args, **kwargs):
-        try:
-            password_reset_token = UserCode.objects.get(
-                code=request.data["code"], time__gt=timezone.now()
-            )
-        except UserCode.DoesNotExist:
-            return {"detail": "Not Found"}
-
-        user = password_reset_token.user
-
+    def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        new_password_service = UserServices.user_password_reset_new_password(serializer)
+        return response.Response(data=new_password_service)
 
-        password = serializer.validated_data["password"]
-
-        # Установка нового хэшированного пароля для пользователя
-        user.set_password(password)
-        user.save()
-
-        password_reset_token.delete()  # Удаление токена
-
-        return {"message": "success"}
 
 class PasswordResetTokenViewSet(PostOnlyViewSet):
     """API для введения кода"""
@@ -51,18 +33,11 @@ class PasswordResetTokenViewSet(PostOnlyViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
-
         if serializer.is_valid():
-            try:
-                password_reset_token_service = UserServices.user_password_reset_token_service(serializer)
-                return response.Response(
-                    data={"detail": password_reset_token_service},
-                    status=status.HTTP_200_OK)
-
-            except UserCode.DoesNotExist:
-                return response.Response(
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
-                    data={"error": "Not Found"})
+            password_reset_token_service = UserServices.user_password_reset_token_service(serializer)
+            return response.Response(
+                data=password_reset_token_service,
+                status=status.HTTP_200_OK)
 
 
 class PasswordResetSearchUserViewSet(PostOnlyViewSet):
@@ -75,9 +50,8 @@ class PasswordResetSearchUserViewSet(PostOnlyViewSet):
         code = UserServices.user_password_reset_search_user_service(serializer)
         if code:
             return response.Response(
-                data={"message": "sended", "code": code},
-                status=status.HTTP_200_OK,
-            )
+                data=code,
+                status=status.HTTP_200_OK)
 
 
 class UserRegistrationViewSet(PostOnlyViewSet):
@@ -88,9 +62,7 @@ class UserRegistrationViewSet(PostOnlyViewSet):
         serializer = self.serializer_class(data=request.data)
         try:
             register = UserServices.user_registration_service(serializer)
-            return response.Response(data={
-                "message": "Sended",
-                "detail": register})
+            return response.Response(data=register)
 
         except IntegrityError:
             return response.Response(

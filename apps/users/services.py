@@ -71,12 +71,14 @@ class UserServices:
         # utils.send_to_the_code_phone(
         #     serializer.validated_data["phone_number"], activate_code
         # )
-        return {"code": f"{activate_code}",
+        return {"message": "sended",
+                "code": f"{activate_code}",
                 "user_id": user.id}
 
     @classmethod
     def user_confirm_service(cls, serializer):
-        if cls.__user_code_model.objects.filter(code=serializer.validated_data["code"]):
+        code = cls.__user_code_model.objects.filter(code=serializer.validated_data["code"])
+        if code:
             cls.__user_model.objects.update(is_active=True)
             cls.__user_code_model.objects.filter(
                 code=serializer.validated_data["code"]
@@ -95,16 +97,16 @@ class UserServices:
             return {"message": "ok", "code": code}
 
         except cls.__user_code_model.DoesNotExist:
-            return "Not found"
+            return {"error": "Not found"}
 
     @classmethod
-    def user_password_reset_new_password(cls, request, serializer, **kwargs):
+    def user_password_reset_new_password(cls, serializer, **kwargs):
         try:
             password_reset_token = UserCode.objects.get(
-                code=request.data["code"], time__gt=timezone.now()
+                code=kwargs["code"], time__gt=timezone.now()
             )
         except cls.__user_code_model.DoesNotExist:
-            return {"detail": "Not Found"}
+            return {"error": "Not Found"}
 
         serializer.is_valid(raise_exception=True)
 
@@ -118,19 +120,6 @@ class UserServices:
         password_reset_token.delete()  # Удаление токена
 
         return {"message": "success"}
-
-    # password_reset_token = cls.__user_code_model.objects.get(
-    #         code=kwargs["code"], time__gt=timezone.now()
-    #     )
-    #     serializer.is_valid(raise_exception=True)
-    #
-    #     # Обновление пароля пользователя
-    #     user = password_reset_token.user_id
-    #     password = serializer.validated_data["password"]
-    #     user.password = hashers.make_password(password)
-    #     user.save()
-    #     password_reset_token.delete()  # удаление кода
-    #     return {"message": "success"}
 
     @classmethod
     def user_login_service(cls, request, serializer, **kwargs):

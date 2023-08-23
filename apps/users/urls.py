@@ -25,8 +25,8 @@ router.register(r"reset-password-phone-number", views.PasswordResetSearchUserVie
 router.register(r"reset-password-code", views.PasswordResetTokenViewSet,
                 basename="reset-password-code")
 # создание нового пароля + code
-router.register(r"reset-new-password", views.PasswordResetNewPasswordViewSet,
-                basename="reset-new-password-with-code")
+# router.register(r"reset-new-password", views.PasswordResetNewPasswordViewSet,
+#                 basename="reset-new-password-with-code")
 # профиль
 router.register(r"profile", views.ProfileViewSet,
                 basename="profile")
@@ -52,10 +52,10 @@ urlpatterns = [
     #     name="code",
     # ),
     # # создание нового пароля + code
-    # path(
-    #     "reset-new-password/<int:code>/",
-    #     views.PasswordResetNewPasswordAPIView.as_view(),
-    #     name="new-password",
+    path(
+        "reset-new-password/<int:code>/",
+        views.PasswordResetNewPasswordViewSet.as_view(),
+        name="new-password"),
     # ),
     # path("profile/", views.ProfileAPIView.as_view(), name="profile-list"),
     # path("profile/<str:id>/", views.ProfileDetailAPIView.as_view(), name="profile-update,delete"),
