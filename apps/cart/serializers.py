@@ -12,9 +12,9 @@ from apps.product.serializers import CategorySerializer
 class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
-    name = serializers.SerializerMethodField()
     product_slug = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
+    product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     is_hit = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
     subcategories = serializers.SerializerMethodField()

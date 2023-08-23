@@ -13,7 +13,7 @@ from ..product.models import Product
 class CartItemListView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
