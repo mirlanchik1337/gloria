@@ -14,7 +14,6 @@ class CartItemListView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
 
-
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -22,25 +21,20 @@ class CartItemListView(generics.ListCreateAPIView):
         return CartItem.objects.filter(user=self.request.user)
 
     def delete(self, request, *args, **kwargs):
-        # Delete all objects
         CartItem.objects.all().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def create(self, request, *args, **kwargs):
         product_id = request.data.get('product')
         user = request.user
-
-        # Check if the product already exists in the cart
         existing_item = CartItem.objects.filter(product_id=product_id, user=user).first()
 
         if existing_item:
-            # If the product is already in the cart, just increase the quantity
             existing_item.quantity += 1
             existing_item.save()
             serializer = CartItemSerializer(existing_item)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            # If the product is not in the cart, create a new item
             serializer = CartItemSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=user)
@@ -117,6 +111,7 @@ class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
+
 
 class BannersViewSet(generics.ListAPIView):
     queryset = Banners.objects.all()

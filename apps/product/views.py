@@ -5,6 +5,8 @@ from apps.product import filters as filtration
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
+
+from apps.product.filters import CustomSearchFilter
 from apps.product.models import (Product, Category,
                                  Subcategory, QuationsAnswers,
                                  Review, Stories,
@@ -29,7 +31,7 @@ class ProductViewSet(ReadOnlyModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'product_slug'
-    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
+    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter, CustomSearchFilter)
     filterset_class = filtration.ProductFilters
     filterset_fields = [
         'name', 'category',
