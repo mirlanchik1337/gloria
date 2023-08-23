@@ -37,7 +37,7 @@ class ProductViewSet(ReadOnlyModelViewSet):
         'quantity']
     search_fields = ['name', 'description']
     ordering = ['id']
-    ordering_fields = ['name']
+    ordering_fields = ['price']
     pagination_class = ProductLimitOffsetPagination
 
 

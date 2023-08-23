@@ -18,6 +18,9 @@ class CartItemListView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def get_queryset(self):
+        return CartItem.objects.filter(user=self.request.user)
+
     def delete(self, request, *args, **kwargs):
         # Delete all objects
         CartItem.objects.all().delete()
@@ -49,6 +52,9 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartItemSerializer
     lookup_field = 'id'
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+
+    def get_queryset(self):
+        return CartItem.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
