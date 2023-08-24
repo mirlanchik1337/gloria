@@ -7,7 +7,15 @@ from .models import (Product, Category, Subcategory,
                      TitleOnBall, ImageModel)
 
 
+class SubcategoryForCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subcategory
+        fields = '__all__'
+
+
 class CategorySerializer(ModelSerializer):
+    subcategories = SubcategoryForCategorySerializer(many=True, source='subcategory_set')
+
     class Meta:
         model = Category
         fields = "__all__"
@@ -81,7 +89,7 @@ class WhatsAppLinkSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PostCardPriceSerialzier(serializers.ModelSerializer):
+class PostCardPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostCardPrice
         fields = '__all__'

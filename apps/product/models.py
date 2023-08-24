@@ -69,7 +69,7 @@ class Product(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name='Название товара', db_index=True)
     product_slug = models.SlugField(max_length=100, db_index=True, unique=True, verbose_name='URl', default='',
                                     help_text="Перед вводом названия продукта очистите это поле")
-    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену")
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену", verbose_name='Цена')
     description = models.TextField(verbose_name='Описание товара', blank=True, null=True)
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
@@ -80,6 +80,7 @@ class Product(models.Model):
                                       null=True, blank=True)
     second_subcategories = models.ForeignKey(SecondSubcategory, on_delete=models.CASCADE,
                                              verbose_name='Вторая подкатегория товара', null=True, blank=True)
+    volume = models.PositiveIntegerField(null=True)
 
     class Meta:
         ordering = ('id', 'name', 'product_slug')
@@ -192,3 +193,17 @@ class TitleOnBall(models.Model):
     class Meta:
         verbose_name = "Надпись на Шаре"
         verbose_name_plural = "Надпись на Шаре"
+
+
+class Transport(models.Model):
+    model = models.CharField(max_length=100, verbose_name='Модель транспорта')
+    min_volume = models.PositiveIntegerField(verbose_name='Минимальнео значение')
+    max_volume = models.PositiveIntegerField(verbose_name='Максимальное значение')
+    price = models.FloatField(verbose_name='Цена')
+
+    def __str__(self):
+        return f'{self.model}'
+
+    class Meta:
+        verbose_name = "Транспорт"
+        verbose_name_plural = "Транспорты"
