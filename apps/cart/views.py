@@ -13,6 +13,7 @@ from ..product.models import Product
 class CartItemListView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
+    lookup_field = 'product_id'
 
 
     def perform_create(self, serializer):
