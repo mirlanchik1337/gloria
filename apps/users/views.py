@@ -82,8 +82,6 @@ class PasswordResetTokenViewSet(PostOnlyViewSet):
 
 
 class PasswordResetSearchUserViewSet(PostOnlyViewSet):
-    """API для поиска user и создание кода"""
-
     serializer_class = serializers.PasswordResetSearchUserSerializer
 
     def create(self, request, *args, **kwargs):

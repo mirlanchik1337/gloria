@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from core.settings.yasg import urlpatterns_swagger
+from .yasg import urlpatterns_swagger
 from django.conf import settings
 from django.conf.urls.static import static
 
