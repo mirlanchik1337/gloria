@@ -66,7 +66,7 @@ class SecondSubcategory(models.Model):
 
 
 class Product(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name='Название товара', db_index=True)
+    name= models.CharField(max_length=100, unique=True, verbose_name='Название товара', db_index=True)
     product_slug = models.SlugField(max_length=100, db_index=True, unique=True, verbose_name='URl', default='',
                                     help_text="Перед вводом названия продукта очистите это поле")
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Введите цену")

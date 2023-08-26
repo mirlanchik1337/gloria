@@ -44,7 +44,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    price = serializers.FloatField(min_value=1)
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
     categories = CategorySerializer(many=False)
     subcategories = SubcategorySerializer(many=False)
     second_subcategories = SecondSubcategorySerializer(many=False)
