@@ -78,12 +78,9 @@ class Product(models.Model):
     categories = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товара')
     subcategories = models.ForeignKey(Subcategory, on_delete=models.CASCADE, verbose_name='Подкатегория товара',
                                       null=True, blank=True)
-<<<<<<< HEAD
     second_subcategories = models.ForeignKey(SecondSubcategory, on_delete=models.CASCADE,
                                              verbose_name='Вторая подкатегория товара', null=True, blank=True)
-=======
     volume = models.PositiveIntegerField(null=True)
->>>>>>> Abdumalik
 
     class Meta:
         ordering = ('id', 'name', 'product_slug')
@@ -146,7 +143,6 @@ class WhatsAppLink(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-<<<<<<< HEAD
 class PostCardPrice(models.Model):
     price = models.IntegerField(verbose_name='Цена открытки')
 
@@ -197,10 +193,8 @@ class TitleOnBall(models.Model):
     class Meta:
         verbose_name = "Надпись на Шаре"
         verbose_name_plural = "Надпись на Шаре"
-=======
 class Transport(models.Model):
     model = models.CharField(max_length=100)
     min_volume = models.PositiveIntegerField()
     max_volume = models.PositiveIntegerField()
     price = models.FloatField()
->>>>>>> Abdumalik

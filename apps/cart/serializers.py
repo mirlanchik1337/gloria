@@ -17,7 +17,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     is_hit = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
-    subcategories = serializers.SerializerMethodField()
+    # subcategories = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
@@ -44,8 +44,8 @@ class CartItemSerializer(serializers.ModelSerializer):
     def get_categories(self, obj):
         return obj.product.categories.id
 
-    def get_subcategories(self, obj):
-        return obj.product.subcategories.id
+    # def get_subcategories(self, obj):
+    #     return obj.product.subcategories.id
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
