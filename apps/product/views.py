@@ -10,7 +10,6 @@ from apps.product.models import (Product, Category,
                                  Review, Stories,
                                  WhatsAppLink, SecondSubcategory,
                                  PostCard, TitleOnBall)
-
 from apps.product.serializers import (
     ProductSerializer,
     CategorySerializer,
@@ -108,3 +107,4 @@ class PostCardViewSet(ModelViewSet):
 class TitleOnBallViewSet(ModelViewSet):
     queryset = TitleOnBall.objects.all()
     serializer_class = TitleOnBallSerializer
+

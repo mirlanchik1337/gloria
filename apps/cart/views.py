@@ -13,7 +13,7 @@ from ..product.models import Product
 class CartItemListView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
-    lookup_field = 'product_id'
+    lookup_field = 'id'
 
 
     def perform_create(self, serializer):
@@ -83,10 +83,32 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        product_id = request.data.get('product_id')
+
+        if product_id is not None:
+            try:
+                product = Product.objects.get(pk=product_id)
+            except Product.DoesNotExist:
+                return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            instance.product = product
+
+        quantity = request.data.get('quantity')
+        if quantity is not None:
+            instance.quantity = quantity
+
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
 
 class FavoriteItemListView(generics.ListCreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
+    lookup_field = 'product_id'
 
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
@@ -113,8 +135,8 @@ class FavoriteItemListView(generics.ListCreateAPIView):
 class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
-    lookup_field = 'id'
     permission_classes = [IsAuthenticated, ]
+    lookup_field = 'id'
 
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
