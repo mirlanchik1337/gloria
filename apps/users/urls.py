@@ -94,7 +94,7 @@ urlpatterns = [
     #     views.PasswordResetNewPasswordViewSet.as_view(),
     #     name="new-password",
     # ),
-    path("set-password/", views.SetPassword.as_view())
+    # path("set-password/", views.SetPassword.as_view())
     # path("profile/", views.ProfileAPIView.as_view(), name="profile-list"),
     # path("profile/<str:id>/", views.ProfileDetailAPIView.as_view(), name="profile-update,delete"),
 ]

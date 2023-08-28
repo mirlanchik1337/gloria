@@ -8,16 +8,15 @@ from .constants import base_url, urls_media
 from apps.product.serializers import CategorySerializer
 
 
-
 class CartItemSerializer(serializers.ModelSerializer):
+    product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     price = serializers.SerializerMethodField()
-    id = serializers.SerializerMethodField()
     product_slug = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
-    product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     is_hit = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
     subcategories = serializers.SerializerMethodField()
+    id = serializers.ReadOnlyField(source='product.pk')  # Используйте ReadOnlyField для id
 
     class Meta:
         model = CartItem
@@ -35,61 +34,54 @@ class CartItemSerializer(serializers.ModelSerializer):
     def get_is_hit(self, obj):
         return obj.product.is_hit
 
-    def get_id(self, obj):
-        return obj.id
-
-    def get_name(self, obj):
-        return obj.product.name
-
     def get_categories(self, obj):
         return obj.product.categories.id
 
     def get_subcategories(self, obj):
         return obj.product.subcategories.id
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        product_representation = {
+            'id': instance.product.id,
+            'name': instance.product.name,
+            'price': instance.product.price,
+            'product_slug': instance.product.product_slug,
+            'description': instance.product.description,
+            'is_hit': instance.product.is_hit,
+            'categories': instance.product.categories.id,
+            'subcategories': instance.product.subcategories.id,
+        }
+        representation.update(product_representation)
+        return representation
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    price = serializers.SerializerMethodField()
     product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
-    product_slug = serializers.SerializerMethodField()
-    description = serializers.SerializerMethodField()
-    is_hit = serializers.SerializerMethodField()
-    quantity = serializers.SerializerMethodField()
 
     class Meta:
         model = FavoriteProduct
         fields = '__all__'
 
-    def get_image(self, obj):
-        return f'{obj.product.imag}'
-
-    def get_price(self, obj):
-        return obj.product.price
-
-    def get_product_slug(self, obj):
-        return obj.product.product_slug
-
-    def get_description(self, obj):
-        return obj.product.description
-
-    def get_is_hit(self, obj):
-        return obj.product.is_hit
-
-    def get_name(self, obj):
-        return obj.product.name
-
-    def get_quantity(self, obj):
-        return obj.product.quantity
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        product_representation = {
+            'name': instance.product.name,
+            'price': instance.product.price,
+            'product_slug': instance.product.product_slug,
+            'description': instance.product.description,
+            'is_hit': instance.product.is_hit,
+            'quantity': instance.product.quantity,
+        }
+        representation.update(product_representation)
+        return representation
 
     def create(self, validated_data):
-        user = self.context['request'].user  # Get the user from the request
+        user = self.context['request'].user
         favorite, created = FavoriteProduct.objects.get_or_create(
             user=user,
-            product=validated_data['product']  # Use the product field from the validated_data
+            product=validated_data['product']
         )
         return favorite
-
 
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
