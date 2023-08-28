@@ -1,14 +1,13 @@
-ORDER_CHOICES = (
-    (1, "В обработке"),
-    (2, "Оплачено"),
-    (3, "Отменён"),
-)
-
-
-
 class OrderStatus:
-
+    order_status = (
+        (1, "Наличными"),
+        (2, "Картой"),
+    )
 
 
 class PaymentTypeForOrder:
-    pass
+    type_order = (
+        (1, "В обработке"),
+        (2, "Оплачено"),
+        (3, "Отменён"),
+    )

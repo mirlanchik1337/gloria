@@ -15,8 +15,8 @@ from .settings import (
     PaymentStatus,
 )
 from .models import Transaction
-from apps.users import models
-from products.settings import PaymentTypeForOrder
+from apps.product.settings import PaymentTypeForOrder
+from rest_framework.exceptions import APIException
 
 
 class PaymentService:
@@ -28,11 +28,11 @@ class PaymentService:
     @classmethod
     def create_transaction(cls, user, amount, order):
         if user != order.user:
-            raise (
+            raise cls.__model.DoesNotExist(
                 "Заказ который был отправлен не является заказом этого пользователя"
             )
-        if order.payment_type != PaymentTypeForOrder.card[0]:
-            raise SomethingGetWrongException(
+        if order.payment_type != PaymentTypeForOrder.type_order[0]:
+            raise APIException(
                 "Заказ с наличным типом оплаты не может быть оплачен через карту"
             )
         return cls.__model.objects.create(
@@ -44,14 +44,14 @@ class PaymentService:
 
     @classmethod
     def payment(
-        cls,
-        pg_order_id,
-        pg_amount,
-        pg_description,
-        pg_salt,
-        pg_result_url,
-        pg_success_url,
-        pg_success_url_method="GET",
+            cls,
+            pg_order_id,
+            pg_amount,
+            pg_description,
+            pg_salt,
+            pg_result_url,
+            pg_success_url,
+            pg_success_url_method="GET",
     ):
         link = cls.__get_link(
             pg_order_id=pg_order_id,
@@ -67,7 +67,6 @@ class PaymentService:
         res = json.dumps(text)
 
         return json.loads(res)
-    
 
     @staticmethod
     def __hash_signature(base_url, *args):
@@ -77,14 +76,14 @@ class PaymentService:
 
     @classmethod
     def __get_link(
-        cls,
-        pg_order_id,
-        pg_amount,
-        pg_description,
-        pg_salt,
-        pg_result_url,
-        pg_success_url,
-        pg_success_url_method,
+            cls,
+            pg_order_id,
+            pg_amount,
+            pg_description,
+            pg_salt,
+            pg_result_url,
+            pg_success_url,
+            pg_success_url_method,
     ):
         sig = CreateSignature.create_init_payment_sig(
             pg_order_id=pg_order_id,
@@ -110,29 +109,29 @@ class PaymentService:
         )
 
         link = (
-            "https://api.paybox.money/init_payment.php?"
-            "pg_order_id=%s&"
-            "pg_merchant_id=%s&"
-            "pg_amount=%s&"
-            "pg_description=%s&"
-            "pg_salt=%s&"
-            "pg_sig=%s&"
-            "pg_result_url=%s&"
-            "pg_success_url=%s&"
-            "pg_success_url_method=%s&"
-            "pg_testing_mode=%s"
-            % (
-                pg_order_id,
-                cls.__merchat_id,
-                pg_amount,
-                pg_description,
-                pg_salt,
-                sig.hexdigest(),
-                pg_result_url,
-                pg_success_url,
-                pg_success_url_method,
-                cls.__pg_testing_mode,
-            )
+                "https://api.paybox.money/init_payment.php?"
+                "pg_order_id=%s&"
+                "pg_merchant_id=%s&"
+                "pg_amount=%s&"
+                "pg_description=%s&"
+                "pg_salt=%s&"
+                "pg_sig=%s&"
+                "pg_result_url=%s&"
+                "pg_success_url=%s&"
+                "pg_success_url_method=%s&"
+                "pg_testing_mode=%s"
+                % (
+                    pg_order_id,
+                    cls.__merchat_id,
+                    pg_amount,
+                    pg_description,
+                    pg_salt,
+                    sig.hexdigest(),
+                    pg_result_url,
+                    pg_success_url,
+                    pg_success_url_method,
+                    cls.__pg_testing_mode,
+                )
         )
         return link
 
@@ -182,13 +181,13 @@ class PaymentService:
         )
 
         link = (
-            "https://api.paybox.money/get_status2.php?"
-            "pg_merchant_id=%s&"
-            "pg_payment_id=%s&"
-            "pg_order_id=%s&"
-            "pg_salt=%s&"
-            "pg_sig=%s&"
-            % (cls.__merchat_id, pg_payment_id, pg_order_id, pg_salt, sig.hexdigest())
+                "https://api.paybox.money/get_status2.php?"
+                "pg_merchant_id=%s&"
+                "pg_payment_id=%s&"
+                "pg_order_id=%s&"
+                "pg_salt=%s&"
+                "pg_sig=%s&"
+                % (cls.__merchat_id, pg_payment_id, pg_order_id, pg_salt, sig.hexdigest())
         )
         response = requests.get(link)
         text = xmltodict.parse(response.text)  # retur json in string
@@ -198,13 +197,13 @@ class PaymentService:
 
     @classmethod
     def result_url(
-        cls,
-        pg_order_id,
-        pg_payment_id,
-        pg_salt,
-        pg_sig,
-        pg_payment_date,
-        pg_result,
+            cls,
+            pg_order_id,
+            pg_payment_id,
+            pg_salt,
+            pg_sig,
+            pg_payment_date,
+            pg_result,
     ):
         with trs.atomic():
             transaction = cls.__model.objects.filter(id=pg_order_id)
@@ -240,16 +239,15 @@ class CreateSignature:
 
     @classmethod
     def create_init_payment_sig(
-        cls,
-        pg_order_id=None,
-        pg_amount=None,
-        pg_description=None,
-        pg_salt=None,
-        pg_result_url=None,
-        pg_success_url=None,
-        pg_success_url_method=None,
+            cls,
+            pg_order_id=None,
+            pg_amount=None,
+            pg_description=None,
+            pg_salt=None,
+            pg_result_url=None,
+            pg_success_url=None,
+            pg_success_url_method=None,
     ) -> str:
-
         signature = "init_payment.php;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s" % (
             pg_amount,
             pg_description,
@@ -271,10 +269,10 @@ class CreateSignature:
 
     @classmethod
     def create_answer_sig(
-        cls,
-        pg_description=None,
-        pg_salt=None,
-        pg_status=None,
+            cls,
+            pg_description=None,
+            pg_salt=None,
+            pg_status=None,
     ) -> str:
         signature = "init_payment.php;%s;%s;%s" % (
             pg_status,
@@ -287,10 +285,10 @@ class CreateSignature:
 
     @classmethod
     def create_status_sig(
-        cls,
-        pg_order_id=None,
-        pg_payment_id=None,
-        pg_salt=None,
+            cls,
+            pg_order_id=None,
+            pg_payment_id=None,
+            pg_salt=None,
     ) -> str:
         signature = "get_status2.php;%s;%s;%s;%s;%s" % (
             cls.__merchat_id,
