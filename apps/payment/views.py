@@ -51,7 +51,7 @@ class ResultURLAPIView(generics.GenericAPIView):
             pg_payment_date=serializer.validated_data.get("pg_payment_date"),
             pg_result=serializer.validated_data.get("pg_result"),
         )
-        link_url = self.request.build_absolute_uri("/")
+        # link_url = self.request.build_absolute_uri("/")
         # text = message_card_payment_info(data.first().id, link_url)
         # TelegramService.send_order(text)
         res = PaymentService.answer(pg_status=data.first().pg_result)

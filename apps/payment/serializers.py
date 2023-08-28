@@ -3,7 +3,8 @@ from rest_framework import serializers
 from .models import Transaction
 from apps.product.settings import OrderStatus, PaymentTypeForOrder
 from apps.users.serializers import UserSerializer
-from products.serializers import OrderSerializer, CartItemSerializer
+from apps.cart.serializers import CartItemSerializer
+from apps.product.serializers import OrderSerializer
 
 
 class InitPaymentSerialiizer(serializers.ModelSerializer):

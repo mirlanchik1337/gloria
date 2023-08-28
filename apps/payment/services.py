@@ -1,3 +1,4 @@
+from rest_framework.exceptions import APIException
 from django.db import transaction as trs
 
 import hashlib
@@ -16,19 +17,19 @@ from .settings import (
 )
 from .models import Transaction
 from apps.product.settings import PaymentTypeForOrder
-from rest_framework.exceptions import APIException
-
+from apps.users.models import User
 
 class PaymentService:
     __model = Transaction
     __pg_testing_mode = payment_testing_mode
     __merchat_id = merchat_id
     __merchant_secret = merchat_secret
+    __user_model = User
 
     @classmethod
     def create_transaction(cls, user, amount, order):
         if user != order.user:
-            raise cls.__model.DoesNotExist(
+            raise cls.__user_model.DoesNotExist(
                 "Заказ который был отправлен не является заказом этого пользователя"
             )
         if order.payment_type != PaymentTypeForOrder.type_order[0]:
