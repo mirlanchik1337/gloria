@@ -63,3 +63,9 @@ class SetPasswordSerilizer(serializers.Serializer):
     )
     new_password = serializers.CharField(
         style={"input_type": "password"}, help_text="min length 6", min_length=6)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "id fullname phone_number last_name".split()
