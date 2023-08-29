@@ -18,6 +18,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     categories = serializers.SerializerMethodField()
     subcategories = serializers.SerializerMethodField()
     id = serializers.ReadOnlyField(source='product.pk')  # Используйте ReadOnlyField для id
+    # subcategories = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem

@@ -4,10 +4,18 @@ from .models import (Product, Category, Subcategory,
                      QuationsAnswers, Review, Stories,
                      WhatsAppLink, SecondSubcategory,
                      PostCard, PostCardPrice,
-                     TitleOnBall, ImageModel)
+                     TitleOnBall, ImageModel, Order, TypeOfOrder, Filial)
+
+
+class SubcategoryForCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subcategory
+        fields = '__all__'
 
 
 class CategorySerializer(ModelSerializer):
+    subcategories = SubcategoryForCategorySerializer(many=True, source='subcategory_set')
+
     class Meta:
         model = Category
         fields = "__all__"
@@ -81,7 +89,7 @@ class WhatsAppLinkSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PostCardPriceSerialzier(serializers.ModelSerializer):
+class PostCardPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostCardPrice
         fields = '__all__'
@@ -102,3 +110,27 @@ class TitleOnBallSerializer(serializers.ModelSerializer):
     class Meta:
         model = TitleOnBall
         fields = ['id', 'user', 'text', 'size', 'product']
+
+
+class FilialSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=100, read_only=True)
+    address = serializers.CharField(max_length=100, read_only=True)
+
+    class Meta:
+        model = Filial
+        fields = '__all__'
+
+#
+# class TypeOfOrderSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = TypeOfOrder
+#         fields = "__all__"
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    filial = FilialSerializer()
+    # type_of_order = TypeOfOrderSerializer()
+
+    class Meta:
+        model = Order
+        fields = '__all__'

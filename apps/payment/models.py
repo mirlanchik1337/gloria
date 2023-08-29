@@ -3,8 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from .settings import PaymentStatus
-from products.models import Orders
-
+from apps.product.models import Order
 User = get_user_model()
 
 
@@ -18,7 +17,7 @@ class Transaction(models.Model):
         verbose_name=_("пользователь"),
     )
     order = models.OneToOneField(
-        Orders,
+        Order,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

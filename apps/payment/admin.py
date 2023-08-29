@@ -4,7 +4,7 @@ from .models import Transaction
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ["user", "amount", "payment_method", "payment_date", "status", "created_at"]
+    list_display = ["user", "amount", "payment_method", "payment_date", "status"]
     fields = [
         "user",
         "order",
@@ -20,10 +20,9 @@ class TransactionAdmin(admin.ModelAdmin):
         "pg_card_pan",
         "pg_sig",
         "status",
-        "created_at"
     ]
     readonly_fields = fields
-    ordering = ["-created_at"]
+    # ordering = ["-created_at"]
     search_fields = ["order__payment_type", "user__full_name", "order__order_id"]
     list_filter = ["status"]
     list_per_page = 25
@@ -41,3 +40,5 @@ class TransactionAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return True
         return False
+
+

@@ -3,7 +3,7 @@ from apps.product.models import (Product, Category,
                                  Review, Stories, SecondSubcategory,
                                  PostCard, PostCardPrice,
                                  TitleOnBall, FontSize,
-                                 ImageModel)
+                                 ImageModel, Transport, Order, TypeOfOrder, Filial)
 
 from django.contrib import admin
 
@@ -55,6 +55,13 @@ class SecondSubcategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'second_subcategory_slug': ('name',)}
 
 
+class TransportAdmin(admin.ModelAdmin):
+    list_display = ('model', 'price', 'min_volume', 'max_volume')
+
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('person_name', 'phone_number', 'price')
+
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Subcategory, SubcategoryAdmin)
@@ -67,3 +74,7 @@ admin.site.register(ImageModel)
 admin.site.register(PostCardPrice)
 admin.site.register(TitleOnBall)
 admin.site.register(FontSize)
+admin.site.register(Transport, TransportAdmin)
+admin.site.register(Order, OrderAdmin)
+admin.site.register(TypeOfOrder)
+admin.site.register(Filial)
