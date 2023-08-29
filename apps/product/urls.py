@@ -10,7 +10,7 @@ from apps.product.views import (
     StoriesViewSet,
     WhatsAppLinkViewSet,
     SecondSubcategoryViewSet,
-    PostCardViewSet, TitleOnBallViewSet
+    PostCardViewSet, TitleOnBallViewSet, OrderViewSet
 )
 
 router = DefaultRouter()
@@ -24,7 +24,8 @@ router = DefaultRouter()
     router.register(r'whatsapp', WhatsAppLinkViewSet, basename='whatsapp_link'),
     router.register(r'second-subcategories', SecondSubcategoryViewSet, basename='second_subcategory'),
     router.register(r'postcards', PostCardViewSet, basename='post_card'),
-    router.register(r'titleonballs', TitleOnBallViewSet, basename='title_on_ball')
+    router.register(r'titleonballs', TitleOnBallViewSet, basename='title_on_ball'),
+    router.register(r'orders', OrderViewSet, basename='order')
 )
 
 urlpatterns = router.urls
