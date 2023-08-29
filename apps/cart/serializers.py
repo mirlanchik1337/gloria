@@ -8,6 +8,7 @@ from .constants import base_url, urls_media
 from apps.product.serializers import CategorySerializer
 
 
+
 class CartItemSerializer(serializers.ModelSerializer):
     product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     price = serializers.SerializerMethodField()
@@ -24,6 +25,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     def get_price(self, obj):
         return obj.product.price * obj.quantity
+
 
     def get_product_slug(self, obj):
         return obj.product.product_slug
@@ -55,12 +57,14 @@ class CartItemSerializer(serializers.ModelSerializer):
         representation.update(product_representation)
         return representation
 
+
 class FavoriteSerializer(serializers.ModelSerializer):
     product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
 
     class Meta:
         model = FavoriteProduct
         fields = '__all__'
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -88,3 +92,7 @@ class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banners
         fields = '__all__'
+
+    def get_price(self, obj):
+        return obj.product.price
+

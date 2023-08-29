@@ -35,7 +35,8 @@ LIBRARY_APPS = [
 LOCAL_APPS = [
     'apps.product',
     'apps.users',
-    'apps.cart'
+    'apps.cart',
+    'apps.payment'
 ]
 
 INSTALLED_APPS = [
