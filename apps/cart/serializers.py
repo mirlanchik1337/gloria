@@ -83,6 +83,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         )
         return favorite
 
+
 class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Banners
