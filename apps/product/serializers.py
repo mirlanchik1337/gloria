@@ -98,7 +98,6 @@ class PostCardPriceSerializer(serializers.ModelSerializer):
 class PostCardSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
-    # product = ProductSerializer()
     class Meta:
         model = PostCard
         fields = ['id', 'user', 'text', 'price', 'product']
@@ -112,25 +111,7 @@ class TitleOnBallSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'text', 'size', 'product']
 
 
-class FilialSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=100, read_only=True)
-    address = serializers.CharField(max_length=100, read_only=True)
-
-    class Meta:
-        model = Filial
-        fields = '__all__'
-
-#
-# class TypeOfOrderSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = TypeOfOrder
-#         fields = "__all__"
-
-
 class OrderSerializer(serializers.ModelSerializer):
-    filial = FilialSerializer()
-    # type_of_order = TypeOfOrderSerializer()
-
     class Meta:
         model = Order
         fields = '__all__'

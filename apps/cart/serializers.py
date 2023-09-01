@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, request
 from rest_framework import serializers
 from .models import FavoriteProduct
 from apps.cart.models import CartItem, Banners
@@ -8,25 +8,22 @@ from .constants import base_url, urls_media
 from apps.product.serializers import CategorySerializer
 
 
-
 class CartItemSerializer(serializers.ModelSerializer):
-    product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
+    # Добавьте необходимые поля и методы
     price = serializers.SerializerMethodField()
     product_slug = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     is_hit = serializers.SerializerMethodField()
     categories = serializers.SerializerMethodField()
     subcategories = serializers.SerializerMethodField()
-    id = serializers.ReadOnlyField(source='product.pk')  # Используйте ReadOnlyField для id
-    # subcategories = serializers.SerializerMethodField()
+    total_price = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
         fields = "__all__"
 
     def get_price(self, obj):
-        return obj.product.price * obj.quantity
-
+        return obj.product.price
 
     def get_product_slug(self, obj):
         return obj.product.product_slug
@@ -42,6 +39,10 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     def get_subcategories(self, obj):
         return obj.product.subcategories.id
+
+    def get_total_price(self, obj):
+        return obj.product.price * obj.quantity
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -65,7 +66,6 @@ class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavoriteProduct
         fields = '__all__'
-
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -96,4 +96,3 @@ class BannerSerializer(serializers.ModelSerializer):
 
     def get_price(self, obj):
         return obj.product.price
-

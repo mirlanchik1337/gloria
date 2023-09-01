@@ -16,6 +16,18 @@ class CartItemListView(generics.ListCreateAPIView):
     lookup_field = 'id'
 
 
+    def list(self, request, *args, **kwargs):
+        cart_items = self.get_queryset()
+        cart_total_price = sum(item.product.price * item.quantity for item in cart_items)
+
+        # Include the total price in the response
+        serializer = self.get_serializer(cart_items, many=True)
+        response_data = {
+            'cart_items': serializer.data,
+            'cart_total_price': cart_total_price  # Add the total price here
+        }
+        return Response(response_data)
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
