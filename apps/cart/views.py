@@ -4,10 +4,11 @@ from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .models import CartItem, FavoriteProduct, Banners
-from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerializer
+from .models import CartItem, FavoriteProduct, Banners, Order
+from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerializer, OrderSerializer
 from apps.cart.permissions import IsOwnerOrReadOnly
 from ..product.models import Product
+from ..product.permissions import IsOwner
 
 
 class CartItemListView(generics.ListCreateAPIView):
@@ -156,3 +157,26 @@ class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 class BannersViewSet(generics.ListAPIView):
     queryset = Banners.objects.all()
     serializer_class = BannerSerializer
+
+
+class OrderApiView(generics.ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        cart_items = CartItem.objects.all()
+        for cart_item in cart_items:
+            cart_item.order = serializer.instance
+            cart_item.save()
+
+
+class OrderDetailApiView(generics.RetrieveDestroyAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
+    lookup_field = 'id'

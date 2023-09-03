@@ -209,46 +209,4 @@ class Transport(models.Model):
         verbose_name_plural = "Транспорты"
 
 
-class TypeOfOrder(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Название')
 
-    def __str__(self):
-        return f'{self.name}'
-
-    class Meta:
-        verbose_name = "Тип заказа"
-        verbose_name_plural = "Типы заказа"
-
-
-class Filial(models.Model):
-    name_address = models.CharField(max_length=150, verbose_name='Название филиала')
-
-    def __str__(self):
-        return f'{self.name_address}'
-
-    class Meta:
-        verbose_name = "Филиал"
-        verbose_name_plural = "Филиалы"
-
-
-class Order(models.Model):
-    person_name = models.CharField(max_length=100, verbose_name='Имя заказчика')
-    phone_number = models.CharField(max_length=15, verbose_name='Номер телефона')
-    type_of_order = models.ForeignKey('TypeOfOrder', on_delete=models.CASCADE, verbose_name='Вид заказа')
-    as_soon_as_possible = models.BooleanField(default=False, verbose_name='Как можно скорее')
-    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания заказа')
-    filial = models.ForeignKey(Filial, on_delete=models.CASCADE, verbose_name='Филиал')
-    order_date_time = models.DateTimeField(verbose_name='Дата и время забора заказа')
-    address = models.CharField(max_length=100, verbose_name='Адрес', blank=True, null=True)
-    apartment = models.CharField(max_length=100, verbose_name='Дом/квартира', blank=True, null=True)
-    floor_and_code = models.CharField(max_length=100, verbose_name='Этаж и код от домофона', blank=True, null=True)
-    additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
-    transport = models.ForeignKey(Transport, on_delete=models.CASCADE, verbose_name='Транспорт')
-
-    def __str__(self):
-        return f'{self.person_name}'
-
-    class Meta:
-        verbose_name = "Заказ"
-        verbose_name_plural = "Заказы"

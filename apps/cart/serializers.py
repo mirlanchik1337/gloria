@@ -1,15 +1,11 @@
 from rest_framework import serializers, request
 from rest_framework import serializers
-from .models import FavoriteProduct
+from .models import FavoriteProduct, Order
 from apps.cart.models import CartItem, Banners
 from ..product.models import ImageModel
-from ..product.serializers import ProductSerializer, ProductImageSerializer
-from .constants import base_url, urls_media
-from apps.product.serializers import CategorySerializer
-
+from ..product.serializers import ProductImageSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
-    # Добавьте необходимые поля и методы
     price = serializers.SerializerMethodField()
     product_slug = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
@@ -96,3 +92,11 @@ class BannerSerializer(serializers.ModelSerializer):
 
     def get_price(self, obj):
         return obj.product.price
+
+class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+

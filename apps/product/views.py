@@ -9,7 +9,7 @@ from apps.product.models import (Product, Category,
                                  Subcategory, QuationsAnswers,
                                  Review, Stories,
                                  WhatsAppLink, SecondSubcategory,
-                                 PostCard, TitleOnBall, Order)
+                                 PostCard, TitleOnBall)
 from apps.product.serializers import (
     ProductSerializer,
     CategorySerializer,
@@ -20,9 +20,10 @@ from apps.product.serializers import (
     WhatsAppLinkSerializer,
     SecondSubcategorySerializer,
     PostCardSerializer,
-    TitleOnBallSerializer, OrderSerializer)
+    TitleOnBallSerializer)
 from apps.product.pagination import CustomProductPagination, ProductLimitOffsetPagination
 from .permissions import IsOwner
+from ..cart.models import CartItem
 
 
 class ProductViewSet(ReadOnlyModelViewSet):
@@ -108,10 +109,4 @@ class PostCardViewSet(ModelViewSet):
 class TitleOnBallViewSet(ModelViewSet):
     queryset = TitleOnBall.objects.all()
     serializer_class = TitleOnBallSerializer
-
-
-class OrderViewSet(ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-    # permission_classes = [IsAuthenticated, IsOwner]
 

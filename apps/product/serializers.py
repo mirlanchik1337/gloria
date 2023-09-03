@@ -4,7 +4,8 @@ from .models import (Product, Category, Subcategory,
                      QuationsAnswers, Review, Stories,
                      WhatsAppLink, SecondSubcategory,
                      PostCard, PostCardPrice,
-                     TitleOnBall, ImageModel, Order, TypeOfOrder, Filial)
+                     TitleOnBall, ImageModel)
+from ..cart.models import CartItem , Order
 
 
 class SubcategoryForCategorySerializer(serializers.ModelSerializer):
@@ -111,7 +112,19 @@ class TitleOnBallSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'text', 'size', 'product']
 
 
+class CartItemForOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = "__all__"
+
+
 class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    cart_items_price = serializers.SerializerMethodField()
+
     class Meta:
         model = Order
         fields = '__all__'
+
+    def get_cart_items_price(self, obj):
+        return obj.cart.cart_total_price

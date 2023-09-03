@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from .settings import PaymentStatus
-from apps.product.models import Order
+from ..cart.models import Order
+
 User = get_user_model()
 
 
