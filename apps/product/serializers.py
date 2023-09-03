@@ -101,7 +101,7 @@ class PostCardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PostCard
-        fields = ['id', 'user', 'text', 'price', 'product']
+        fields = ['id', 'user', 'text', 'price']
 
 
 class TitleOnBallSerializer(serializers.ModelSerializer):
@@ -109,7 +109,7 @@ class TitleOnBallSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TitleOnBall
-        fields = ['id', 'user', 'text', 'size', 'product']
+        fields = ['id', 'user', 'text', 'size']
 
 
 class CartItemForOrderSerializer(serializers.ModelSerializer):

@@ -1,15 +1,15 @@
 from apps.users.models import User
 from django.db import models
-from apps.product.models import Product, Category, Transport
+from apps.product.models import Product, Category, Transport, TitleOnBall, PostCard
 
 
 class CartItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
-
+    balls = models.ForeignKey(TitleOnBall, on_delete=models.CASCADE, null=True, blank=True)
+    postcard = models.ForeignKey(PostCard, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         verbose_name = "Корзина"
@@ -81,7 +81,6 @@ class Order(models.Model):
     additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
     transport = models.ForeignKey(Transport, on_delete=models.CASCADE, verbose_name='Транспорт')
     cart_items = models.ManyToManyField(CartItem)
-
 
     def __str__(self):
         return f'{self.person_name}'

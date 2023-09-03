@@ -16,7 +16,7 @@ class CartItemListView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     lookup_field = 'id'
-
+    permission_classes = [IsAuthenticated]
     def list(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
         cart_total_price = sum(item.product.price * item.quantity for item in cart_items)
@@ -123,6 +123,7 @@ class FavoriteItemListView(generics.ListCreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     lookup_field = 'product_id'
+    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
@@ -151,6 +152,7 @@ class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FavoriteSerializer
     permission_classes = [IsAuthenticated, ]
     lookup_field = 'id'
+    lookup_url_kwarg = 'product_id'
 
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
@@ -161,33 +163,22 @@ class BannersViewSet(generics.ListAPIView):
     serializer_class = BannerSerializer
 
 
-from django.utils import timezone
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from .models import Order, CartItem
-from .serializers import OrderSerializer
 
 
 class OrderApiView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
+    lookup_field = 'id'
 
     def create(self, request, *args, **kwargs):
         user = request.user
         cart_items = CartItem.objects.filter(user=user)
         order = Order.objects.create(user=user, order_date_time=timezone.now())
-
-        # Добавляем все товары из корзины в заказ
         for cart_item in cart_items:
             order.cart_items.add(cart_item)
-
-        # Сохраняем остальные поля заказа
         order.filial_id = order.filial.name_address.id
         order.save()
-
-        # Очищаем корзину пользователя
         cart_items.delete()
 
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
@@ -204,3 +195,4 @@ class OrderDetailApiView(generics.RetrieveDestroyAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
+    lookup_url_kwarg = 'order_id'
