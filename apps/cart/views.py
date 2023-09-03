@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics
 from rest_framework.filters import SearchFilter
@@ -15,7 +16,6 @@ class CartItemListView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     lookup_field = 'id'
-
 
     def list(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
@@ -118,6 +118,7 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         return Response(serializer.data)
 
+
 class FavoriteItemListView(generics.ListCreateAPIView):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
@@ -154,6 +155,7 @@ class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
 
+
 class BannersViewSet(generics.ListAPIView):
     queryset = Banners.objects.all()
     serializer_class = BannerSerializer
@@ -164,15 +166,21 @@ class OrderApiView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
 
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        cart_items = CartItem.objects.filter(user=user)
+        order = Order.objects.create(user=user, order_date_time=timezone.now())
+        Order.objects.create(order=order, product=cart_items.product,
+                             filial_id=order.filial.name_address.id)
+        cart_items.delete()
+
+        return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
+
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        cart_items = CartItem.objects.all()
-        for cart_item in cart_items:
-            cart_item.order = serializer.instance
-            cart_item.save()
 
 
 class OrderDetailApiView(generics.RetrieveDestroyAPIView):

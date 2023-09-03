@@ -8,7 +8,7 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, null=1, blank=1)
+
 
     class Meta:
         verbose_name = "Корзина"
@@ -73,13 +73,14 @@ class Order(models.Model):
     as_soon_as_possible = models.BooleanField(default=False, verbose_name='Как можно скорее')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания заказа')
     filial = models.ForeignKey(Filial, on_delete=models.CASCADE, verbose_name='Филиал')
-    order_date_time = models.DateTimeField(verbose_name='Дата и время забора заказа')
+    order_date_time = models.DateTimeField(verbose_name='Дата и время забора заказа', auto_created=True)
     address = models.CharField(max_length=100, verbose_name='Адрес', blank=True, null=True)
     apartment = models.CharField(max_length=100, verbose_name='Дом/квартира', blank=True, null=True)
     floor_and_code = models.CharField(max_length=100, verbose_name='Этаж и код от домофона', blank=True, null=True)
     additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
     transport = models.ForeignKey(Transport, on_delete=models.CASCADE, verbose_name='Транспорт')
-    cart_items_link = models.CharField(max_length=200, default='http://127.0.0.1:8000/api/v1/cart-items/' ,null=True ,blank=True)
+    cart_items = models.ForeignKey(CartItem , on_delete=models.CASCADE)
+
 
     def __str__(self):
         return f'{self.person_name}'
