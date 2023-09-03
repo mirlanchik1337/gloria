@@ -5,6 +5,7 @@ from apps.cart.models import CartItem, Banners
 from ..product.models import ImageModel
 from ..product.serializers import ProductImageSerializer
 
+
 class CartItemSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
     product_slug = serializers.SerializerMethodField()
@@ -38,7 +39,6 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         return obj.product.price * obj.quantity
-
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -93,10 +93,17 @@ class BannerSerializer(serializers.ModelSerializer):
     def get_price(self, obj):
         return obj.product.price
 
-class OrderSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+class CartOrderSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Order
+        model = CartItem
         fields = '__all__'
 
 
+class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    cart_items = CartItemSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = '__all__'

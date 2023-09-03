@@ -10,6 +10,7 @@ class CartItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+
     class Meta:
         verbose_name = "Корзина"
         verbose_name_plural = "Корзина"
@@ -79,7 +80,7 @@ class Order(models.Model):
     floor_and_code = models.CharField(max_length=100, verbose_name='Этаж и код от домофона', blank=True, null=True)
     additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
     transport = models.ForeignKey(Transport, on_delete=models.CASCADE, verbose_name='Транспорт')
-    cart_items = models.ForeignKey(CartItem , on_delete=models.CASCADE)
+    cart_items = models.ManyToManyField(CartItem)
 
 
     def __str__(self):
