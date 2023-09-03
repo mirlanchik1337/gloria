@@ -85,6 +85,12 @@ class Order(models.Model):
     def __str__(self):
         return f'{self.person_name}'
 
+    def select_transport(self):
+        transports = Transport.objects.all()
+        for transport in transports:
+            if transport.is_suitable_for_order(self):
+                return transport
+
     class Meta:
         verbose_name = "Заказ"
         verbose_name_plural = "Заказы"

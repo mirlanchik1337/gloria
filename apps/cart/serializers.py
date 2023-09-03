@@ -14,6 +14,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     categories = serializers.SerializerMethodField()
     subcategories = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
+    total_volume = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
@@ -39,6 +40,9 @@ class CartItemSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         return obj.product.price * obj.quantity
+
+    def get_total_volume(self, obj):
+        return obj.product.volume * obj.quantity
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

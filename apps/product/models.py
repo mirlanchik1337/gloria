@@ -202,9 +202,9 @@ class Transport(models.Model):
     def __str__(self):
         return f'{self.model}'
 
+    def is_suitable_for_order(self, order):
+        return self.min_volume <= order.total_volume <= self.max_volume
+
     class Meta:
         verbose_name = "Транспорт"
         verbose_name_plural = "Транспорты"
-
-
-
