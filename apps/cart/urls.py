@@ -1,9 +1,9 @@
 # urls.py
 from django.urls import path
-from .views import FavoriteItemListView, FavoriteItemDetailView, CartItemListView, CartItemDetailView ,BannersViewSet , OrderApiView , OrderDetailApiView
-
-
-
+from .views import (FavoriteItemListView, FavoriteItemDetailView,
+                    CartItemListView, CartItemDetailView,
+                    BannersViewSet, OrderApiView,
+                    OrderDetailApiView)
 
 urlpatterns = [
     path('cart-items/', CartItemListView.as_view(), name='cart-item-list'),

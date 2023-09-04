@@ -1,162 +1,39 @@
-from django.utils import timezone
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets, generics
-from rest_framework.filters import SearchFilter
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
 from .models import CartItem, FavoriteProduct, Banners, Order
 from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerializer, OrderSerializer
 from apps.cart.permissions import IsOwnerOrReadOnly
-from ..product.models import Product
 from ..product.permissions import IsOwner
+from ..cart import services
 
 
-class CartItemListView(generics.ListCreateAPIView):
+class CartItemListView(services.CartItemListViewService):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     lookup_field = 'id'
     permission_classes = [IsAuthenticated]
 
-    def list(self, request, *args, **kwargs):
-        cart_items = CartItem.objects.all()
-        cart_total_price = sum(item.product.price * item.quantity for item in cart_items)
 
-        # Include the total price in the response
-        serializer = self.get_serializer(cart_items, many=True)
-        response_data = {
-            'cart_items': serializer.data,
-            'cart_total_price': cart_total_price  # Add the total price here
-        }
-        return Response(response_data)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return CartItem.objects.filter(user=self.request.user)
-
-    def delete(self, request, *args, **kwargs):
-        # Delete all objects
-        CartItem.objects.all().delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def create(self, request, *args, **kwargs):
-        product_id = request.data.get('product')
-        user = request.user
-
-        # Check if the product already exists in the cart
-        existing_item = CartItem.objects.filter(product_id=product_id, user=user).first()
-
-        if existing_item:
-            # If the product is already in the cart, just increase the quantity
-            existing_item.quantity += 1
-            existing_item.save()
-            serializer = CartItemSerializer(existing_item)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            # If the product is not in the cart, create a new item
-            serializer = CartItemSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(user=user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
+class CartItemDetailView(services.CartItemDetailViewService):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     lookup_field = 'id'
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
-    def get_queryset(self):
-        return CartItem.objects.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def create(self, request, *args, **kwargs):
-        product_id = request.data.get('product_id')
-
-        if product_id is None:
-            return Response({"detail": "product_id is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            product = Product.objects.get(pk=product_id)
-        except Product.DoesNotExist:
-            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        cart_item_data = {
-            "product": product.id,
-            "user": request.user.id,
-            "quantity": 1  # You might want to adjust this default value
-        }
-
-        serializer = self.get_serializer(data=cart_item_data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def put(self, request, *args, **kwargs):
-        instance = self.get_object()
-        product_id = request.data.get('product_id')
-
-        if product_id is not None:
-            try:
-                product = Product.objects.get(pk=product_id)
-            except Product.DoesNotExist:
-                return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-
-            instance.product = product
-
-        quantity = request.data.get('quantity')
-        if quantity is not None:
-            instance.quantity = quantity
-
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        return Response(serializer.data)
-
-
-class FavoriteItemListView(generics.ListCreateAPIView):
+class FavoriteItemListView(services.FavoriteItemListService):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     lookup_field = 'product_id'
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
-    def get_queryset(self):
-        return FavoriteProduct.objects.filter(user=self.request.user)
 
-    def create(self, request, *args, **kwargs):
-        product_id = request.data.get('product_id')
-        user = request.user  # Assuming you have implemented user authentication
-
-        # Check if the product is already in the user's favorites
-        if FavoriteProduct.objects.filter(user=user, product_id=product_id).exists():
-            return Response({"detail": "Product is already in favorites."}, status=status.HTTP_400_BAD_REQUEST)
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(user=user)  # Save the favorite with the user reference
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def delete(self, request, *args, **kwargs):
-        # Delete all favorite objects
-        FavoriteProduct.objects.all().delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class FavoriteItemDetailView(generics.RetrieveUpdateDestroyAPIView):
+class FavoriteItemDetailView(services.FavoriteItemDetailViewService):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
     permission_classes = [IsAuthenticated, ]
     lookup_field = 'id'
     lookup_url_kwarg = 'product_id'
-
-    def get_queryset(self):
-        return FavoriteProduct.objects.filter(user=self.request.user)
 
 
 class BannersViewSet(generics.ListAPIView):
@@ -164,48 +41,15 @@ class BannersViewSet(generics.ListAPIView):
     serializer_class = BannerSerializer
 
 
-class OrderApiView(generics.ListCreateAPIView):
+class OrderApiView(services.OrderApiService):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
 
-    def create(self, request, *args, **kwargs):
-        user = request.user
-        cart_items = CartItem.objects.filter(user=user)
-        order = Order.objects.create(user=user, order_date_time=timezone.now())
-        for cart_item in cart_items:
-            order.cart_items.add(cart_item)
-        order.filial_id = order.filial.name_address.id
-        order.save()
-        cart_items.delete()
 
-        return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
-
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class OrderDetailApiView(generics.RetrieveDestroyAPIView):
+class OrderDetailApiView(services.OrderDetailServiceApiView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated, IsOwner]  # Define IsOwner permission if not already done
-
-    # Override the list method to include cart items and total price
-    def list(self, request, *args, **kwargs):
-        # Retrieve cart items related to the order
-        order_id = self.kwargs['order_id']
-        cart_items = CartItem.objects.filter(order_id=order_id)
-        if cart_items.product:
-            cart_total_price = sum(item.product.price * item.quantity for item in cart_items)
-        elif cart_items.postcard and cart_items.balls:
-            cart_total_price = cart_items.postcard_total_price + cart_items.balls.price
-        serializer = CartItemSerializer(cart_items, many=True)
-        response_data = {
-            'cart_items': serializer.data,
-            'cart_total_price': cart_total_price,
-        }
-        return Response(response_data)
+    permission_classes = [IsAuthenticated, IsOwner]
+    lookup_field = 'id'

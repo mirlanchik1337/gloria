@@ -1,5 +1,7 @@
 from django.contrib import admin
-from apps.cart.models import CartItem, FavoriteProduct, Banners, Order, TypeOfOrder, Filial
+from apps.cart.models import (CartItem, FavoriteProduct,
+                              Banners, Order,
+                              TypeOfOrder, Filial)
 
 
 class OrderAdmin(admin.ModelAdmin):

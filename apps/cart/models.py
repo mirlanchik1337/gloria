@@ -1,6 +1,8 @@
 from apps.users.models import User
 from django.db import models
-from apps.product.models import Product, Category, Transport, TitleOnBall, PostCard
+from apps.product.models import (Product, Category,
+                                 Transport, TitleOnBall,
+                                 PostCard)
 
 
 class CartItem(models.Model):
@@ -86,9 +88,21 @@ class Order(models.Model):
     additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
     transport = models.ForeignKey(Transport, on_delete=models.CASCADE, verbose_name='Транспорт')
     cart_items = models.ManyToManyField(CartItem)
+    price = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.person_name}'
+
+    def get_price(self):
+        total_price = 0
+        for cart_item in self.cart_items.all():
+            if cart_item.product:
+                total_price += cart_item.product.price * cart_item.quantity
+            elif cart_item.balls:
+                total_price += cart_item.balls.price * cart_item.quantity
+            elif cart_item.postcard:
+                total_price += cart_item.postcard.price * cart_item.quantity
+        return total_price
 
     def select_transport(self):
         transports = Transport.objects.all()

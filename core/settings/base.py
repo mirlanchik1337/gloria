@@ -89,16 +89,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware'
 ]
 
-#
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://127.0.0.1:8000",
-#     "http://localhost",
-#     "http://127.0.0.1:",
-#     "http://localhost:8080",
-#     "http://127.0.0.1",
-# ]
-
 REST_FRAMEWORK = {
     "NON_FIELD_ERRORS_KEY": "errors",
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -146,17 +136,6 @@ DATABASES = {
     }
 }
 
-#
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME':
-#         'USER':
-#         'PASSWORD':
-#         'HOST':
-#     }
-# }
-
 DATE_FORMAT = '%d.%m.%Y'
 DATETIME_FORMAT = '%d.%m.%Y. %H:%M'
 STATIC_URL = 'static/'
@@ -189,22 +168,8 @@ else:
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'Ru-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-STATIC_URL = 'static/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media/'
-AUTH_USER_MODEL = "users.User"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
