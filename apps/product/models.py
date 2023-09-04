@@ -184,6 +184,7 @@ class TitleOnBall(models.Model):
     is_cart = models.BooleanField(default=False, verbose_name='Добавление надписи к шару')
     size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=10, verbose_name='Размер шрифта')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    price = models.IntegerField(default=0, verbose_name='price')
 
     def __str__(self):
         return f'{self.user}_{self.text}'

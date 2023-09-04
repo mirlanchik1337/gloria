@@ -13,7 +13,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(max_length=255)
     last_name = models.CharField(max_length=40, null=True, blank=True)
     date_of_birthday = models.DateField(null=True, blank=True)
-    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, null=True, blank=True)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES,null=True, blank=True)
     avatar = models.ImageField(null=True, upload_to='avatars/', blank=True)
     is_active = models.BooleanField("Активен", default=False)
     is_staff = models.BooleanField("Персонал", default=False)

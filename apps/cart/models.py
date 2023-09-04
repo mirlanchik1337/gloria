@@ -16,7 +16,12 @@ class CartItem(models.Model):
         verbose_name_plural = "Корзина"
 
     def __str__(self):
-        return f'{self.product.name}'
+        if self.product:
+            return f"{self.product.name}"
+        elif self.postcard:
+            return f"{self.postcard.text}"
+        elif self.balls:
+            return f"{self.balls.text}"
 
 
 class FavoriteProduct(models.Model):

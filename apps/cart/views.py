@@ -17,8 +17,9 @@ class CartItemListView(generics.ListCreateAPIView):
     serializer_class = CartItemSerializer
     lookup_field = 'id'
     permission_classes = [IsAuthenticated]
+
     def list(self, request, *args, **kwargs):
-        cart_items = self.get_queryset()
+        cart_items = CartItem.objects.all()
         cart_total_price = sum(item.product.price * item.quantity for item in cart_items)
 
         # Include the total price in the response
@@ -163,8 +164,6 @@ class BannersViewSet(generics.ListAPIView):
     serializer_class = BannerSerializer
 
 
-
-
 class OrderApiView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
@@ -193,6 +192,20 @@ class OrderApiView(generics.ListCreateAPIView):
 class OrderDetailApiView(generics.RetrieveDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated, IsOwner]
-    lookup_field = 'id'
-    lookup_url_kwarg = 'order_id'
+    permission_classes = [IsAuthenticated, IsOwner]  # Define IsOwner permission if not already done
+
+    # Override the list method to include cart items and total price
+    def list(self, request, *args, **kwargs):
+        # Retrieve cart items related to the order
+        order_id = self.kwargs['order_id']
+        cart_items = CartItem.objects.filter(order_id=order_id)
+        if cart_items.product:
+            cart_total_price = sum(item.product.price * item.quantity for item in cart_items)
+        elif cart_items.postcard and cart_items.balls:
+            cart_total_price = cart_items.postcard_total_price + cart_items.balls.price
+        serializer = CartItemSerializer(cart_items, many=True)
+        response_data = {
+            'cart_items': serializer.data,
+            'cart_total_price': cart_total_price,
+        }
+        return Response(response_data)
