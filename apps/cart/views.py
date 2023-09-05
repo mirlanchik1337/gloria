@@ -5,6 +5,8 @@ from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerialize
 from apps.cart.permissions import IsOwnerOrReadOnly
 from ..product.permissions import IsOwner
 from ..cart import services
+from .services import  send_order_notification 
+from django.shortcuts import redirect
 
 
 class CartItemListView(services.CartItemListViewService):
@@ -45,10 +47,21 @@ class OrderApiView(services.OrderApiService):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
+    
+    # def perform_create(self, serializer):
+    #         instance = serializer.save()
+    #         send_order_notification(sender=Order, instance=instance, created=True)
+    #         return redirect('http://127.0.0.1:8000/api/v1/products/') 
 
 
 class OrderDetailApiView(services.OrderDetailServiceApiView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
-    lookup_field = 'id'
+    lookup_field = 'id' 
+
+    def perform_create(self, serializer):
+            instance = serializer.save()
+            send_order_notification(sender=Order, instance=instance, created=True)
+            return redirect('http://127.0.0.1:8000/api/v1/products/') 
+

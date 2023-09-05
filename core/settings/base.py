@@ -9,6 +9,8 @@ PRODUCTION = False
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config("SECRET_KEY")
 AUTH_USER_MODEL = "users.User"
+TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN")
+
 
 app = Celery('gloria_backend')
 app.config_from_object('django.conf:settings', namespace='CELERY')

@@ -72,7 +72,18 @@ class Filial(models.Model):
         verbose_name = "Филиал"
         verbose_name_plural = "Филиалы"
 
+class Chat(models.Model):
+    chat_id = models.CharField(max_length=100, unique=True, verbose_name="ID админа")
+    username = models.CharField(max_length=100, blank=True, null=True, verbose_name="Username")
+    bot_owner = models.BooleanField(default=False, verbose_name="Владелец бота") 
 
+    def __str__(self):
+        return str(self.chat_id)
+
+    class Meta:
+        verbose_name = "Админ телеграм"
+        verbose_name_plural = "Админ телеграма"
+        
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     person_name = models.CharField(max_length=100, verbose_name='Имя заказчика')
