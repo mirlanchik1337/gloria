@@ -33,7 +33,6 @@ class FavoriteItemDetailView(services.FavoriteItemDetailViewService):
     serializer_class = FavoriteSerializer
     permission_classes = [IsAuthenticated, ]
     lookup_field = 'id'
-    lookup_url_kwarg = 'product_id'
 
 
 class BannersViewSet(generics.ListAPIView):

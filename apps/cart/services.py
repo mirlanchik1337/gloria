@@ -37,6 +37,14 @@ class OrderApiService(generics.ListCreateAPIView):
         return quantity
 
 
+
+
+
+
+
+
+
+
 class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
     def list_order_detail(self, request):
         user = request.user
