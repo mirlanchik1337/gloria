@@ -13,7 +13,10 @@ class OrderApiService(generics.ListCreateAPIView):
         order = Order.objects.create(user=user, order_date_time=timezone.now())
         for cart_item in cart_items:
             order.cart_items.add(cart_item)
-        order.filial_id = order.filial.name_address.id
+        if order.filial.name_address:
+            order.filial_id = order.filial.name_address
+        else:
+            order.filial_id = 1
         order.save()
         cart_items.delete()
 
@@ -32,6 +35,7 @@ class OrderApiService(generics.ListCreateAPIView):
         product.quantity = quantity
         product.save()
         return quantity
+
 
 class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
     def list_order_detail(self, request):

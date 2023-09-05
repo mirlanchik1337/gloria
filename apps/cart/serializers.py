@@ -5,6 +5,7 @@ from ..product.serializers import ProductImageSerializer
 
 
 class CartItemSerializer(serializers.ModelSerializer):
+    product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     price = serializers.SerializerMethodField()
     product_slug = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
