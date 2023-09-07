@@ -1,5 +1,6 @@
+from django.db.models import Sum
 from django.utils import timezone
-from rest_framework import generics, status
+from rest_framework import generics, status, request
 from rest_framework.response import Response
 from apps.cart.models import Order, CartItem, FavoriteProduct
 from apps.cart.serializers import OrderSerializer, CartItemSerializer
@@ -9,24 +10,39 @@ from django.dispatch import receiver
 from django.conf import settings
 from telegram import Bot
 import asyncio
-from apps.cart.models import Order,Chat
+from apps.cart.models import Order, Chat
+from apps.product.services import send_notification
 
 
 class OrderApiService(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         user = request.user
         cart_items = CartItem.objects.filter(user=user)
-        order = Order.objects.create(user=user, order_date_time=timezone.now())
-        for cart_item in cart_items:
-            order.cart_items.add(cart_item)
-        if order.filial.name_address:
+
+        # Вычисляем общую цену заказа
+        total_price = sum(cart_item.price * cart_item.quantity for cart_item in cart_items)
+
+        order = Order.objects.create(user=user, order_date_time=timezone.now(), total_price=total_price)
+
+        # Связываем элементы корзины с заказом
+        order.cart_items.set(cart_items)
+
+        # Устанавливаем филиал
+        if order.filial and order.filial.name_address:
             order.filial_id = order.filial.name_address
         else:
             order.filial_id = 1
+
         order.save()
         cart_items.delete()
 
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
+
+    def get_price(self, request):
+        user = request.user
+        orders = Order.objects.filter(user=user)
+        total_price = orders.aggregate(Sum('cart_items__price'))['cart_items__price__sum']
+        return Response({"total_price": total_price}, status=status.HTTP_200_OK)
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
@@ -34,18 +50,19 @@ class OrderApiService(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    def get_quantity(self):
-        cart_items = CartItem.objects.all()
-        product = Product.objects.get(id=self.kwargs.get('product_id'))
-        quantity = product.quantity - cart_items.quantity
-        product.quantity = quantity
-        product.save()
-        return quantity
+    def get_quantity(self, request, product_id):
+        cart_item = CartItem.objects.filter(user=request.user, product_id=product_id).first()
+        if cart_item:
+            product = Product.objects.get(id=product_id)
+            quantity = product.quantity - cart_item.quantity
+            product.quantity = quantity
+            product.save()
+            return Response({"quantity": quantity}, status=status.HTTP_200_OK)
+        return Response({"message": "Cart item not found"}, status=status.HTTP_404_NOT_FOUND)
 
+    def get_transport(self, request):
+        return Response({"transport": self.kwargs.get('transport')}, status=status.HTTP_200_OK)
 
-async def send_notification(chat_id, message):
-    bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
-    await bot.send_message(chat_id=chat_id, text=message)
 
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
 def send_order_notification(sender, instance, created, **kwargs):
@@ -70,17 +87,24 @@ def send_order_notification(sender, instance, created, **kwargs):
         if instance.additional_to_order:
             message += f"Доп инфо к заказу: {instance.additional_to_order}\n"
 
-        message += f"Цена: {instance.price} сом\n"
+        total_price = instance.cart_items.aggregate(Sum('price'))['price__sum']
+        message += f"Цена: {total_price} сом\n"
         message += f"Транспорт: {instance.transport}"
 
-        # Отправляем уведомление владельцу бота
         try:
             chat = Chat.objects.get(bot_owner=True)
             asyncio.run(send_notification(chat.chat_id, message))
         except Chat.DoesNotExist:
             pass
-   
 
+
+class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
+    def list_order_detail(self, request):
+        user = request.user
+        orders = Order.objects.filter(user=user)
+        serializer = OrderSerializer(orders, many=True)
+        total_price = orders.aggregate(Sum('cart_items__price'))['cart_items__price__sum']
+        return Response({"total_price": total_price, "details": serializer.data}, status=status.HTTP_200_OK)
 
 class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
     def list_order_detail(self, request):
