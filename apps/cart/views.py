@@ -56,7 +56,12 @@ class OrderDetailApiView(services.OrderDetailServiceApiView):
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
 
-    def perform_create(self, serializer):
-        instance = serializer.save()
-        send_order_notification(sender=Order, instance=instance, created=True)
-        return redirect('http://127.0.0.1:8000/api/v1/products/')
+
+class HistoryOrderApiView(generics.ListAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated, IsOwner]
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)

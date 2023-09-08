@@ -28,34 +28,29 @@ class CartItemSerializer(serializers.ModelSerializer):
         return 0
 
     def get_product_slug(self, obj):
-        if obj.product:
-            return obj.product.product_slug
-        return ""
+        return obj.product.product_slug
 
     def get_description(self, obj):
         if obj.product:
             return obj.product.description
-        return ""
 
     def get_is_hit(self, obj):
         if obj.product:
             return obj.product.is_hit
-        return False
 
     def get_categories(self, obj):
         if obj.product and obj.product.categories:
             return obj.product.categories.id
-        return 0
+
 
     def get_subcategories(self, obj):
         if obj.product and obj.product.subcategories:
             return obj.product.subcategories.id
-        return 0
+
 
     def get_total_price(self, obj):
         if obj.product:
             return obj.product.price * obj.quantity
-        return 0
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -107,9 +102,6 @@ class BannerSerializer(serializers.ModelSerializer):
         model = Banners
         fields = '__all__'
 
-    def get_price(self, obj):
-        return obj.product.price
-
 
 class CartOrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -119,12 +111,9 @@ class CartOrderSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    cart_items = CartItemSerializer(many=True)
-    price = serializers.SerializerMethodField()
-
+    cart_items = CartItemSerializer(many=False, read_only=True)
+    price = CartItemSerializer(read_only=True, source='cart_items.product.price')
     class Meta:
         model = Order
         fields = '__all__'
 
-    def get_price(self, obj):
-        return obj.get_price()

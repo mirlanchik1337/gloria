@@ -6,6 +6,7 @@ from apps.product.models import (Product, Category,
 
 
 class CartItem(models.Model):
+    order = models.ForeignKey('cart.Order', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -51,16 +52,6 @@ class Banners(models.Model):
         verbose_name_plural = "Баннеры"
 
 
-class TypeOfOrder(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Название')
-
-    def __str__(self):
-        return f'{self.name}'
-
-    class Meta:
-        verbose_name = "Тип заказа"
-        verbose_name_plural = "Типы заказа"
-
 
 class Filial(models.Model):
     name_address = models.CharField(max_length=150, verbose_name='Название филиала')
@@ -72,10 +63,11 @@ class Filial(models.Model):
         verbose_name = "Филиал"
         verbose_name_plural = "Филиалы"
 
+
 class Chat(models.Model):
     chat_id = models.CharField(max_length=100, unique=True, verbose_name="ID админа")
     username = models.CharField(max_length=100, blank=True, null=True, verbose_name="Username")
-    bot_owner = models.BooleanField(default=False, verbose_name="Владелец бота") 
+    bot_owner = models.BooleanField(default=False, verbose_name="Владелец бота")
 
     def __str__(self):
         return str(self.chat_id)
@@ -83,12 +75,17 @@ class Chat(models.Model):
     class Meta:
         verbose_name = "Админ телеграм"
         verbose_name_plural = "Админ телеграма"
-        
+
+
 class Order(models.Model):
+    TYPE_ORDERING = (
+        ('Доставка', 'Доставка'),
+        ('Самовывоз', 'Самовывоз'),
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     person_name = models.CharField(max_length=100, verbose_name='Имя заказчика')
     phone_number = models.CharField(max_length=15, verbose_name='Номер телефона')
-    type_of_order = models.ForeignKey('TypeOfOrder', on_delete=models.CASCADE, verbose_name='Вид заказа')
+    type_of_order = models.CharField(max_length=100, verbose_name='Тип заказа', choices=TYPE_ORDERING)
     as_soon_as_possible = models.BooleanField(default=False, verbose_name='Как можно скорее')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания заказа')
     filial = models.ForeignKey(Filial, on_delete=models.CASCADE, verbose_name='Филиал')
@@ -98,22 +95,15 @@ class Order(models.Model):
     floor_and_code = models.CharField(max_length=100, verbose_name='Этаж и код от домофона', blank=True, null=True)
     additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
     transport = models.ForeignKey(Transport, on_delete=models.CASCADE, verbose_name='Транспорт')
-    cart_items = models.ManyToManyField(CartItem)
     price = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.person_name}'
 
-    def get_price(self):
-        total_price = 0
-        for cart_item in self.cart_items.all():
-            if cart_item.product:
-                total_price += cart_item.product.price * cart_item.quantity
-            elif cart_item.balls:
-                total_price += cart_item.balls.price * cart_item.quantity
-            elif cart_item.postcard:
-                total_price += cart_item.postcard.price * cart_item.quantity
-        return total_price
+    # def get_price(self):
+    #     from django.db.models import Sum
+    #     self.total_price = self.cartitem_set.objects.aggregate(Sum('price'))['price__sum']
+    #     return self.total_price
 
     def select_transport(self):
         transports = Transport.objects.all()

@@ -120,11 +120,7 @@ class CartItemForOrderSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    cart_items_price = serializers.SerializerMethodField()
-
     class Meta:
         model = Order
         fields = '__all__'
 
-    def get_cart_items_price(self, obj):
-        return obj.cart.cart_total_price
