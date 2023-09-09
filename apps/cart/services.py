@@ -106,14 +106,6 @@ class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
         total_price = orders.aggregate(Sum('cart_items__price'))['cart_items__price__sum']
         return Response({"total_price": total_price, "details": serializer.data}, status=status.HTTP_200_OK)
 
-class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
-    def list_order_detail(self, request):
-        user = request.user
-        order = Order.objects.filter(user=user)
-        serializer = self.get_serializer(order, many=True)
-        total_price = serializer.get_total_price(order.cart_items.total_price * order.cart_items.quantity)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class FavoriteItemListService(generics.ListCreateAPIView):
     def get_queryset(self):
@@ -142,96 +134,25 @@ class FavoriteItemDetailViewService(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
 
-
 class CartItemListViewService(generics.ListCreateAPIView):
+    serializer_class = CartItemSerializer
+
+    def get_queryset(self):
+        return CartItem.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
     def list(self, request, *args, **kwargs):
-        cart_items = CartItem.objects.all()
+        cart_items = self.get_queryset()
 
-        # Include the total price in the response
+        # Фильтруем объекты, чтобы убедиться, что они существуют в базе данных
+        cart_items = [item for item in cart_items if CartItem.objects.filter(pk=item.id).exists()]
+
+        # Сериализуем данные cart_items
         serializer = self.get_serializer(cart_items, many=True)
-        response_data = {
-            'cart_items': serializer.data,
-        }
-        return Response(response_data)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return CartItem.objects.filter(user=self.request.user)
-
-    def delete(self, request, *args, **kwargs):
-        # Delete all objects
-        CartItem.objects.all().delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def create(self, request, *args, **kwargs):
-        product_id = request.data.get('product')
-        user = request.user
-
-        # Check if the product already exists in the cart
-        existing_item = CartItem.objects.filter(product_id=product_id, user=user).first()
-
-        if existing_item:
-            # If the product is already in the cart, just increase the quantity
-            existing_item.quantity += 1
-            existing_item.save()
-            serializer = CartItemSerializer(existing_item)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            # If the product is not in the cart, create a new item
-            serializer = CartItemSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(user=user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class CartItemDetailViewService(generics.RetrieveUpdateDestroyAPIView):
-    def get_queryset(self):
-        return CartItem.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def create(self, request, *args, **kwargs):
-        product_id = request.data.get('product_id')
-
-        if product_id is None:
-            return Response({"detail": "product_id is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            product = Product.objects.get(pk=product_id)
-        except Product.DoesNotExist:
-            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        cart_item_data = {
-            "product": product.id,
-            "user": request.user.id,
-            "quantity": 1  # You might want to adjust this default value
-        }
-
-        serializer = self.get_serializer(data=cart_item_data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def put(self, request, *args, **kwargs):
-        instance = self.get_object()
-        product_id = request.data.get('product_id')
-
-        if product_id is not None:
-            try:
-                product = Product.objects.get(pk=product_id)
-            except Product.DoesNotExist:
-                return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
-            instance.product = product
-
-        quantity = request.data.get('quantity')
-        if quantity is not None:
-            instance.quantity = quantity
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        # Возвращаем только данные cart_items без обертки
         return Response(serializer.data)
 

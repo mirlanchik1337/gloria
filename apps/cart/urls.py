@@ -13,5 +13,4 @@ urlpatterns = [
     path('banners/', BannersViewSet.as_view()),
     path('orders/', OrderApiView.as_view()),
     path('orders/<int:id>/', OrderDetailApiView.as_view()),
-
 ]

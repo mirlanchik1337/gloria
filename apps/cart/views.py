@@ -16,7 +16,7 @@ class CartItemListView(services.CartItemListViewService):
     permission_classes = [IsAuthenticated]
 
 
-class CartItemDetailView(services.CartItemDetailViewService):
+class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     lookup_field = 'id'
@@ -26,7 +26,7 @@ class CartItemDetailView(services.CartItemDetailViewService):
 class FavoriteItemListView(services.FavoriteItemListService):
     queryset = FavoriteProduct.objects.all()
     serializer_class = FavoriteSerializer
-    lookup_field = 'product_id'
+    lookup_field = 'id'
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
 
