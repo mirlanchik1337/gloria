@@ -17,14 +17,19 @@ from .permissions import IsOwner
 from . import serializers
 
 
-class PasswordResetNewPasswordViewSet(views.APIView):
+class PasswordResetNewPasswordAPIView(views.APIView):
     serializer_class = serializers.PasswordResetNewPasswordSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        new_password_service = UserServices.user_password_reset_new_password(serializer)
-        return response.Response(data=new_password_service)
+        try:
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            code = kwargs.get("code")
+            new_password_service = UserServices.user_password_reset_new_password(serializer, code=code)
+            return response.Response(data=new_password_service, status=status.HTTP_200_OK)
 
+        except Exception as e:
+            return response.Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class PasswordResetTokenViewSet(PostOnlyViewSet):
     """API для введения кода"""
@@ -32,12 +37,15 @@ class PasswordResetTokenViewSet(PostOnlyViewSet):
     serializer_class = serializers.PasswordResetTokenSerializer
 
     def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            password_reset_token_service = UserServices.user_password_reset_token_service(serializer)
-            return response.Response(
-                data=password_reset_token_service,
-                status=status.HTTP_200_OK)
+        try:
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                password_reset_token_service = UserServices.user_password_reset_token_service(serializer)
+                return response.Response(
+                    data=password_reset_token_service,
+                    status=status.HTTP_200_OK)
+        except Exception as e:
+            return response.Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordResetSearchUserViewSet(PostOnlyViewSet):
@@ -45,12 +53,13 @@ class PasswordResetSearchUserViewSet(PostOnlyViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
-        code = UserServices.user_password_reset_search_user_service(serializer)
-        if code:
+        try:
+            code = UserServices.user_password_reset_search_user_service(serializer)
             return response.Response(
                 data=code,
                 status=status.HTTP_200_OK)
-
+        except Exception as e:
+            return response.Response(data={'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserRegistrationViewSet(PostOnlyViewSet):
     queryset = User.objects.all()

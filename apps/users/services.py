@@ -54,7 +54,7 @@ class UserServices:
             return {"code": code}
 
         except cls.__user_model.DoesNotExist:
-            return {"error": "Not Found"}
+            raise Exception
 
     @classmethod
     def user_registration_service(cls, serializer):
@@ -97,7 +97,9 @@ class UserServices:
             return {"message": "ok", "code": code}
 
         except cls.__user_code_model.DoesNotExist:
-            return {"error": "Not found"}
+            raise Exception
+
+
 
     @classmethod
     def user_password_reset_new_password(cls, serializer, **kwargs):
@@ -106,7 +108,7 @@ class UserServices:
                 code=kwargs["code"], time__gt=timezone.now()
             )
         except cls.__user_code_model.DoesNotExist:
-            return {"error": "Not Found"}
+            raise Exception
 
         serializer.is_valid(raise_exception=True)
 

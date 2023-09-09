@@ -5,8 +5,7 @@ from apps.product.models import (Product, Category,
 
 
 class CartItem(models.Model):
-    id = models.AutoField(primary_key=True, unique=True)
-    order = models.ForeignKey('cart.Order', on_delete=models.CASCADE)
+    order = models.ForeignKey('cart.Order', on_delete=models.CASCADE , null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
