@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import FavoriteProduct, Order
 from apps.cart.models import CartItem, Banners
-from ..product.serializers import ProductImageSerializer
+from ..product.serializers import ProductImageSerializer, OrderSerializer
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -42,11 +42,9 @@ class CartItemSerializer(serializers.ModelSerializer):
         if obj.product and obj.product.categories:
             return obj.product.categories.id
 
-
     def get_subcategories(self, obj):
         if obj.product and obj.product.subcategories:
             return obj.product.subcategories.id
-
 
     def get_total_price(self, obj):
         if obj.product:
@@ -111,9 +109,17 @@ class CartOrderSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    cart_items = CartItemSerializer(many=False, read_only=True)
+    cart_items = CartItemSerializer(many=True, source='cartitem_set', read_only=True)
     price = CartItemSerializer(read_only=True, source='cart_items.product.price')
+    order = OrderSerializer(read_only=True, source='cart_item.order')
+    total_cart_price = serializers.SerializerMethodField()
+
     class Meta:
         model = Order
         fields = '__all__'
 
+    def get_total_cart_price(self, obj):
+        total_price = 0
+        for cart_item in obj.cartitem_set.all():
+            total_price += cart_item.product.price * cart_item.quantity
+        return total_price
