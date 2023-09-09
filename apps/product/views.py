@@ -9,7 +9,7 @@ from apps.product.models import (Product, Category,
                                  Subcategory, QuationsAnswers,
                                  Review, Stories,
                                  WhatsAppLink, SecondSubcategory,
-                                 PostCard, TitleOnBall)
+                                 PostCard, Balls)
 from apps.product.serializers import (
     ProductSerializer,
     CategorySerializer,
@@ -20,7 +20,7 @@ from apps.product.serializers import (
     WhatsAppLinkSerializer,
     SecondSubcategorySerializer,
     PostCardSerializer,
-    TitleOnBallSerializer)
+    BalloonsSerializer)
 from apps.product.pagination import CustomProductPagination, ProductLimitOffsetPagination
 from .permissions import IsOwner
 from ..cart.models import CartItem
@@ -107,6 +107,6 @@ class PostCardViewSet(ModelViewSet):
 
 
 class TitleOnBallViewSet(ModelViewSet):
-    queryset = TitleOnBall.objects.all()
-    serializer_class = TitleOnBallSerializer
+    queryset = Balls.objects.all()
+    serializer_class = BalloonsSerializer
 

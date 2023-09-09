@@ -47,13 +47,23 @@ class CartItemSerializer(serializers.ModelSerializer):
             return obj.product.subcategories.id
 
     def get_total_price(self, obj):
+        total_price = 0
         if obj.product:
-            return obj.product.price * obj.quantity
+            product_price = obj.product.price * obj.quantity
+            total_price += product_price
+        elif obj.postcard:
+            postcard_price = obj.postcard.price * obj.quantity
+            total_price += postcard_price
+        elif obj.balls:
+            balls_price = obj.balls.price * obj.quantity
+            total_price += balls_price
+        return total_price
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        product_representation = {
-            'id': instance.id if instance.product else None,
+        cart_representation = {
+            'id': instance.id if instance.id else None,
             'name': instance.product.name if instance.product else None,
             'price': instance.product.price if instance.product else None,
             'product_slug': instance.product.product_slug if instance.product else None,
@@ -62,13 +72,12 @@ class CartItemSerializer(serializers.ModelSerializer):
             'categories': instance.product.categories.id if instance.product and instance.product.categories else None,
             'subcategories': instance.product.subcategories.id if instance.product and instance.product.subcategories else None,
         }
-        representation.update(product_representation)
+        representation.update(cart_representation)
         return representation
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
     product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
-
     class Meta:
         model = FavoriteProduct
         fields = '__all__'

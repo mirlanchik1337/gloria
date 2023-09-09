@@ -1,8 +1,7 @@
 from apps.users.models import User
 from django.db import models
 from apps.product.models import (Product, Category,
-                                 Transport, TitleOnBall,
-                                 PostCard)
+                                 Transport,PostCard)
 
 
 class CartItem(models.Model):
@@ -12,9 +11,6 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    balls = models.ForeignKey(TitleOnBall, on_delete=models.CASCADE, null=True, blank=True)
-    postcard = models.ForeignKey(PostCard, on_delete=models.CASCADE, null=True, blank=True)
-
     class Meta:
         verbose_name = "Корзина"
         verbose_name_plural = "Корзина"
@@ -101,15 +97,12 @@ class Order(models.Model):
     def __str__(self):
         return f'{self.person_name}'
 
-    # def get_price(self):
-    #     from django.db.models import Sum
-    #     self.total_price = self.cartitem_set.objects.aggregate(Sum('price'))['price__sum']
-    #     return self.total_price
 
     def select_transport(self):
         transports = Transport.objects.all()
         for transport in transports:
-            if transport.is_suitable_for_order(self):
+            if transport.is_suitable_for_order():
+                self.transport = transport
                 return transport
 
     class Meta:

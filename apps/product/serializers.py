@@ -4,7 +4,7 @@ from .models import (Product, Category, Subcategory,
                      QuationsAnswers, Review, Stories,
                      WhatsAppLink, SecondSubcategory,
                      PostCard, PostCardPrice,
-                     TitleOnBall, ImageModel)
+                     Balls, ImageModel)
 from ..cart.models import CartItem , Order
 
 
@@ -104,11 +104,10 @@ class PostCardSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'text', 'price']
 
 
-class TitleOnBallSerializer(serializers.ModelSerializer):
+class BalloonsSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
     class Meta:
-        model = TitleOnBall
+        model = Balls
         fields = ['id', 'user', 'text', 'size']
 
 

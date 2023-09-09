@@ -158,7 +158,7 @@ class PostCard(models.Model):
     is_cart = models.BooleanField(default=False, verbose_name='Добавление открытки к букету')
     price = models.ForeignKey(PostCardPrice, on_delete=models.CASCADE, default=25, verbose_name='Цена открытки')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Товар')
 
     def __str__(self):
         return f'{self.user}_{self.text}'
@@ -179,16 +179,16 @@ class FontSize(models.Model):
         verbose_name_plural = "Размеры Надписи"
 
 
-class TitleOnBall(models.Model):
+class Balls(models.Model):
     text = models.CharField(max_length=100, null=True, blank=True, verbose_name='Текст на шаре')
     is_cart = models.BooleanField(default=False, verbose_name='Добавление надписи к шару')
     size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=10, verbose_name='Размер шрифта')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     price = models.IntegerField(default=0, verbose_name='price')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Товар')
 
     def __str__(self):
-        return f'{self.user}_{self.text}'
+        return f'{self.user}_{self.text}_{self.product.name}'
 
     class Meta:
         verbose_name = "Надпись на Шаре"
