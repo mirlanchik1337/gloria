@@ -53,7 +53,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         product_representation = {
-            'id': instance.product.id if instance.product else None,
+            'id': instance.id if instance.product else None,
             'name': instance.product.name if instance.product else None,
             'price': instance.product.price if instance.product else None,
             'product_slug': instance.product.product_slug if instance.product else None,
