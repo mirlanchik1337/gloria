@@ -7,7 +7,6 @@ from apps.cart.models import (CartItem, FavoriteProduct,
 class CartItemInline(admin.StackedInline):
     model = CartItem
 
-
 class OrderAdmin(admin.ModelAdmin):
     inlines = (CartItemInline,)
     list_display = ('person_name', 'phone_number')
