@@ -54,7 +54,7 @@ urlpatterns = [
     # # создание нового пароля + code
     path(
         "reset-new-password/<int:code>/",
-        views.PasswordResetNewPasswordViewSet.as_view(),
+        views.PasswordResetNewPasswordAPIView.as_view(),
         name="new-password"),
     # ),
     # path("profile/", views.ProfileAPIView.as_view(), name="profile-list"),
