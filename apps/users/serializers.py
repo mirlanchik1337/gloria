@@ -49,6 +49,7 @@ class UserLoginSerializer(serializers.Serializer):
     )
 
 
+
 class LogoutSerializer(serializers.Serializer):
     token = serializers.CharField(required=True)
 
