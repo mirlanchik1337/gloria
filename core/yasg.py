@@ -16,11 +16,11 @@ schema_view = get_schema_view(
 
 urlpatterns_swagger = [
     re_path(
-        "swagger/",
+        "api/v1/swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
     re_path(
-        "redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
+        "api/v1/redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
 ]
