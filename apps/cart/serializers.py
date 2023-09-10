@@ -126,6 +126,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
+        ref_name = 'ProductOrder'
 
     def get_total_cart_price(self, obj):
         total_price = 0
