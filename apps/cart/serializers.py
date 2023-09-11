@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import FavoriteProduct, Order
+from .models import FavoriteProduct, Order, Filial
 from apps.cart.models import CartItem, Banners
+from ..product.models import Transport, PostCardPrice
 from ..product.serializers import ProductImageSerializer, OrderSerializer
 
 
@@ -59,7 +60,6 @@ class CartItemSerializer(serializers.ModelSerializer):
             total_price += balls_price
         return total_price
 
-
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         cart_representation = {
@@ -78,6 +78,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class FavoriteSerializer(serializers.ModelSerializer):
     product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
+
     class Meta:
         model = FavoriteProduct
         fields = '__all__'
@@ -133,3 +134,23 @@ class OrderSerializer(serializers.ModelSerializer):
         for cart_item in obj.cartitem_set.all():
             total_price += cart_item.product.price * cart_item.quantity
         return total_price
+
+
+class TransportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transport
+        fields = '__all__'
+
+
+class PricePostCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostCardPrice
+        fields = '__all__'
+
+
+class FilialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Filial
+        fields = '__all__'
+
+

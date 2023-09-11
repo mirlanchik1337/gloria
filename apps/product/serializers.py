@@ -52,13 +52,35 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = "id image".split()
 
 
+class PostCardPriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostCardPrice
+        fields = '__all__'
+
+
+class PostCardSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = PostCard
+        fields = ['id', 'user', 'text', 'price']
+
+
+class BalloonsSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    class Meta:
+        model = Balls
+        fields = ['id', 'user', 'text', 'size']
+
+
 class ProductSerializer(serializers.ModelSerializer):
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
     categories = CategorySerializer(many=False)
     subcategories = SubcategorySerializer(many=False)
     second_subcategories = SecondSubcategorySerializer(many=False)
     product_images = ProductImageSerializer(many=True, read_only=True)
-
+    postcard = PostCardSerializer(many=False, read_only=True)
+    baloons = BalloonsSerializer(many=False , read_only=True)
     class Meta:
         model = Product
         fields = '__all__'
@@ -90,27 +112,6 @@ class WhatsAppLinkSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PostCardPriceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostCardPrice
-        fields = '__all__'
-
-
-class PostCardSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
-    class Meta:
-        model = PostCard
-        fields = ['id', 'user', 'text', 'price']
-
-
-class BalloonsSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    class Meta:
-        model = Balls
-        fields = ['id', 'user', 'text', 'size']
-
-
 class CartItemForOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
@@ -119,6 +120,7 @@ class CartItemForOrderSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = Order
         fields = '__all__'

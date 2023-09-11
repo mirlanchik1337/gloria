@@ -2,10 +2,10 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import CartItem, FavoriteProduct, Banners, Order
-from .serializers import CartItemSerializer, FavoriteSerializer, BannerSerializer, OrderSerializer , CartOrderSerializer
+from .models import CartItem, FavoriteProduct, Banners, Order, Filial
+from apps.cart import serializers
 from apps.cart.permissions import IsOwnerOrReadOnly
-from ..product.models import Product
+from ..product.models import Product, Transport, PostCardPrice
 from ..product.permissions import IsOwner
 from ..cart import services
 from .services import send_order_notification
@@ -14,14 +14,14 @@ from django.shortcuts import redirect
 
 class CartItemListView(services.CartItemListViewService):
     queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
+    serializer_class = serializers.CartItemSerializer
     lookup_field = 'id'
     permission_classes = [IsAuthenticated]
 
 
 class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
+    serializer_class = serializers.CartItemSerializer
     lookup_field = 'id'
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
@@ -57,43 +57,57 @@ class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class FavoriteItemListView(services.FavoriteItemListService):
     queryset = FavoriteProduct.objects.all()
-    serializer_class = FavoriteSerializer
+    serializer_class = serializers.FavoriteSerializer
     lookup_field = 'id'
     permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
 
 
 class FavoriteItemDetailView(services.FavoriteItemDetailViewService):
     queryset = FavoriteProduct.objects.all()
-    serializer_class = FavoriteSerializer
+    serializer_class = serializers.FavoriteSerializer
     permission_classes = [IsAuthenticated, ]
     lookup_field = 'id'
 
 
 class BannersViewSet(generics.ListAPIView):
     queryset = Banners.objects.all()
-    serializer_class = BannerSerializer
-
+    serializer_class = serializers.BannerSerializer
 
 
 class OrderApiView(services.OrderApiService):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+    serializer_class = serializers.OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
 
 
 class OrderDetailApiView(services.OrderDetailServiceApiView):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+    serializer_class = serializers.OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
 
 
 class HistoryOrderApiView(generics.ListAPIView):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer
+    serializer_class = serializers.OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
+
+
+class TransportListView(generics.ListAPIView):
+    queryset = Transport.objects.all()
+    serializer_class = serializers.TransportSerializer
+
+
+class PricePostCardView(generics.ListAPIView):
+    queryset = PostCardPrice.objects.all()
+    serializer_class = serializers.PricePostCardSerializer
+
+
+class FilialView(generics.ListAPIView):
+    queryset = Filial.objects.all()
+    serializer_class = serializers.FilialSerializer
