@@ -184,3 +184,22 @@ class CartItemListViewService(generics.ListCreateAPIView):
         cart_items = self.get_queryset()
         cart_items.delete()
         return Response({"message": "Все объекты из корзины были успешно удалены."})
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        # Проверяем, существует ли объект с указанным id в корзине пользователя
+        product = data.get('product')
+        existing_item = CartItem.objects.filter(user=request.user, product=product).first()
+
+        if existing_item:
+            # Если объект уже существует в корзине, увеличиваем его количество на 1
+            existing_item.quantity += 1
+            existing_item.save()
+            serializer = self.get_serializer(existing_item)
+            return Response(serializer.data)
+        else:
+            # Если объекта нет в корзине, создаем новый объект
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=201)
