@@ -145,6 +145,7 @@ class WhatsAppLink(models.Model):
 
 class PostCardPrice(models.Model):
     price = models.IntegerField(verbose_name='Цена открытки')
+
     def __str__(self):
         return f'{self.price}'
 
@@ -158,10 +159,10 @@ class PostCard(models.Model):
     is_cart = models.BooleanField(verbose_name='Добавление открытки к букету')
     price = models.ForeignKey(PostCardPrice, on_delete=models.CASCADE, default=25, verbose_name='Цена открытки')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Товар')
+    product = models.ManyToManyField(Product)
 
     def __str__(self):
-        return f'{self.user}_{self.text}'
+        return f'{self.user}_{self.text}_{self.pk}_{self.price}'
 
     class Meta:
         verbose_name = "Открытка"
@@ -185,7 +186,7 @@ class Balls(models.Model):
     size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=10, verbose_name='Размер шрифта')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     price = models.IntegerField(default=0, verbose_name='price')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Товар')
+    product = models.ManyToManyField(Product)
 
     def __str__(self):
         return f'{self.user}_{self.text}_{self.product.name}'
