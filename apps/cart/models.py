@@ -4,6 +4,7 @@ from apps.product.models import (Product, Category,
                                  Transport,PostCard)
 
 
+
 class CartItem(models.Model):
     order = models.ForeignKey('cart.Order', on_delete=models.CASCADE , null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -84,13 +85,13 @@ class Order(models.Model):
     type_of_order = models.CharField(max_length=100, verbose_name='Тип заказа', choices=TYPE_ORDERING)
     as_soon_as_possible = models.BooleanField(default=False, verbose_name='Как можно скорее')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания заказа')
-    filial = models.ForeignKey(Filial, on_delete=models.CASCADE, verbose_name='Филиал')
+    filial = models.ForeignKey(Filial, default=1, on_delete=models.SET_DEFAULT)
     order_date_time = models.DateTimeField(verbose_name='Дата и время забора заказа', auto_created=True)
     address = models.CharField(max_length=100, verbose_name='Адрес', blank=True, null=True)
     apartment = models.CharField(max_length=100, verbose_name='Дом/квартира', blank=True, null=True)
     floor_and_code = models.CharField(max_length=100, verbose_name='Этаж и код от домофона', blank=True, null=True)
     additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
-    transport = models.ForeignKey(Transport, on_delete=models.CASCADE, verbose_name='Транспорт')
+    transport = models.ForeignKey(Transport, default=1 ,on_delete=models.SET_DEFAULT, verbose_name='Транспорт')
     price = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
@@ -102,7 +103,7 @@ class Order(models.Model):
         for transport in transports:
             if transport.is_suitable_for_order():
                 self.transport = transport
-                return transport
+            return transport
 
     class Meta:
         verbose_name = "Заказ"

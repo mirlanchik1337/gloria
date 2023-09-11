@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 from rest_framework import generics, status, request
@@ -12,58 +13,81 @@ from telegram import Bot
 import asyncio
 from apps.cart.models import Order, Chat
 from apps.product.services import send_notification
-
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework import generics
+from django.db import transaction
+from django.utils import timezone
 
 class OrderApiService(generics.ListCreateAPIView):
+    serializer_class = OrderSerializer  # Use your Order serializer here
+
     def create(self, request, *args, **kwargs):
         user = request.user
         cart_items = CartItem.objects.filter(user=user)
 
-        # Вычисляем общую цену заказа
-        total_price = sum(cart_item.price * cart_item.quantity for cart_item in cart_items)
+        # Check if the user has cart items
+        if not cart_items.exists():
+            return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        order = Order.objects.create(user=user, order_date_time=timezone.now(), total_price=total_price)
+        # Validate and get the required fields from the request data
+        person_name = request.data.get("person_name")
+        phone_number = request.data.get("phone_number")
+        type_of_order = request.data.get("type_of_order")
 
-        # Связываем элементы корзины с заказом
-        order.cart_items.set(cart_items)
+        if not person_name or not phone_number or not type_of_order:
+            return Response({"error": "person_name, phone_number, and type_of_order are required fields"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        # Устанавливаем филиал
-        if order.filial and order.filial.name_address:
-            order.filial_id = order.filial.name_address
-        else:
-            order.filial_id = 1
+        # Ensure that type_of_order is a valid choice
+        valid_type_choices = dict(Order.TYPE_ORDERING).keys()
+        if type_of_order not in valid_type_choices:
+            return Response({"error": f"Invalid type_of_order value. Choose from {valid_type_choices}"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        order.save()
-        cart_items.delete()
+        # Calculate the total price
+        price = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
 
-        return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
+        try:
+            with transaction.atomic():
+                # Create the order
+                order_data = {
+                    "user": user,
+                    "person_name": person_name,
+                    "phone_number": phone_number,
+                    "type_of_order": type_of_order,
+                    "order_date_time": timezone.now(),
+                    "price": price,
+                    # Add other fields as needed
+                }
+                order_serializer = self.get_serializer(data=order_data)
+                order_serializer.is_valid(raise_exception=True)
+                order_serializer.save()
 
-    def get_price(self, request):
-        user = request.user
-        orders = Order.objects.filter(user=user)
-        total_price = orders.aggregate(Sum('cart_items__price'))['cart_items__price__sum']
-        return Response({"total_price": total_price}, status=status.HTTP_200_OK)
+                # Associate cart items with the order and save each cart item
+                for cart_item in cart_items:
+                    cart_item.order = order_serializer.instance
+                    cart_item.save()
 
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+                # Clear the user's cart
+                cart_items.delete()
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+                # Set the filial_id as you were doing before
+                if order_serializer.instance.filial and order_serializer.instance.filial.name_address:
+                    order_serializer.instance.filial_id = order_serializer.instance.filial.name_address
+                else:
+                    order_serializer.instance.filial_id = 1
 
-    def get_quantity(self, request, product_id):
-        cart_item = CartItem.objects.filter(user=request.user, product_id=product_id).first()
-        if cart_item:
-            product = Product.objects.get(id=product_id)
-            quantity = product.quantity - cart_item.quantity
-            product.quantity = quantity
-            product.save()
-            return Response({"quantity": quantity}, status=status.HTTP_200_OK)
-        return Response({"message": "Cart item not found"}, status=status.HTTP_404_NOT_FOUND)
+                order_serializer.instance.save()
 
-    def get_transport(self, request):
-        return Response({"transport": self.kwargs.get('transport')}, status=status.HTTP_200_OK)
+            return Response(order_serializer.data, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
 def send_order_notification(sender, instance, created, **kwargs):
     if created:
@@ -134,6 +158,7 @@ class FavoriteItemDetailViewService(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
 
+
 class CartItemListViewService(generics.ListCreateAPIView):
     serializer_class = CartItemSerializer
 
@@ -142,7 +167,6 @@ class CartItemListViewService(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
 
     def list(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
@@ -155,4 +179,3 @@ class CartItemListViewService(generics.ListCreateAPIView):
 
         # Возвращаем только данные cart_items без обертки
         return Response(serializer.data)
-

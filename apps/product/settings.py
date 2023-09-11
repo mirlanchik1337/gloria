@@ -5,9 +5,9 @@ class OrderStatus:
     )
 
 
-class PaymentTypeForOrder:
+class StatusForOrder:
     type_order = (
-        (1, "В обработке"),
-        (2, "Оплачено"),
+        (1, "Оформлено"),
+        (2, "В работе"),
         (3, "Отменён"),
     )
