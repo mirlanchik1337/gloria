@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import FavoriteProduct, Order, Filial
 from apps.cart.models import CartItem, Banners
-from ..product.models import Transport, PostCardPrice
+from ..product.models import Transport, PostCardPrice, FontSize
 from ..product.serializers import ProductImageSerializer, OrderSerializer
 
 
@@ -153,4 +153,7 @@ class FilialSerializer(serializers.ModelSerializer):
         model = Filial
         fields = '__all__'
 
-
+class FontSizeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FontSize
+        fields = '__all__'
