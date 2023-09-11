@@ -170,13 +170,10 @@ class CartItemListViewService(generics.ListCreateAPIView):
 
     def list(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
-
         # Фильтруем объекты, чтобы убедиться, что они существуют в базе данных
         cart_items = [item for item in cart_items if CartItem.objects.filter(pk=item.id).exists()]
-
         # Сериализуем данные cart_items
         serializer = self.get_serializer(cart_items, many=True)
-
         # Возвращаем только данные cart_items без обертки
         return Response(serializer.data)
 

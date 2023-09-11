@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from .models import CartItem, FavoriteProduct, Banners, Order, Filial
 from apps.cart import serializers
 from apps.cart.permissions import IsOwnerOrReadOnly
-from ..product.models import Product, Transport, PostCardPrice
+from ..product.models import Product, Transport, PostCardPrice, FontSize
 from ..product.permissions import IsOwner
 from ..cart import services
 from .services import send_order_notification
@@ -111,3 +111,8 @@ class PricePostCardView(generics.ListAPIView):
 class FilialView(generics.ListAPIView):
     queryset = Filial.objects.all()
     serializer_class = serializers.FilialSerializer
+
+
+class FontSizeView(generics.ListAPIView):
+    queryset = FontSize.objects.all()
+    serializer_class = serializers.FontSizeSerializer

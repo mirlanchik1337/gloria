@@ -4,7 +4,8 @@ from .views import (FavoriteItemListView, FavoriteItemDetailView,
                     CartItemListView, CartItemDetailView,
                     BannersViewSet, OrderApiView,
                     OrderDetailApiView , TransportListView,
-                    PricePostCardView , FilialView)
+                    PricePostCardView , FilialView,
+                    FontSizeView)
 
 urlpatterns = [
     path('cart-items/', CartItemListView.as_view(), name='cart-item-list'),
@@ -17,5 +18,6 @@ urlpatterns = [
     path('transport/', TransportListView.as_view()),
     path('pricepostcard/', PricePostCardView.as_view()),
     path('filial/', FilialView.as_view()),
+    path('fontsize/', FontSizeView.as_view()),
 
 ]

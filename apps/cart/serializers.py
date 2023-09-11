@@ -153,6 +153,7 @@ class FilialSerializer(serializers.ModelSerializer):
         model = Filial
         fields = '__all__'
 
+
 class FontSizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FontSize
