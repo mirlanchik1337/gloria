@@ -179,3 +179,8 @@ class CartItemListViewService(generics.ListCreateAPIView):
 
         # Возвращаем только данные cart_items без обертки
         return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        cart_items = self.get_queryset()
+        cart_items.delete()
+        return Response({"message": "Все объекты из корзины были успешно удалены."})
