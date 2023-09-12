@@ -26,6 +26,7 @@ class OrderApiService(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         user = request.user
         cart_items = CartItem.objects.filter(user=user)
+        product = Product.objects.filter(user = user)
 
         # Check if the user has cart items
         if not cart_items.exists():
@@ -35,6 +36,7 @@ class OrderApiService(generics.ListCreateAPIView):
         person_name = request.data.get("person_name")
         phone_number = request.data.get("phone_number")
         type_of_order = request.data.get("type_of_order")
+        postcard= product.postcard_set
 
         if not person_name or not phone_number or not type_of_order:
             return Response({"error": "person_name, phone_number, and type_of_order are required fields"},
@@ -48,6 +50,7 @@ class OrderApiService(generics.ListCreateAPIView):
 
         # Calculate the total price
         price = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
+        price += postcard.price * len(postcard)
 
         try:
             with transaction.atomic():
@@ -203,3 +206,4 @@ class CartItemListViewService(generics.ListCreateAPIView):
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
             return Response(serializer.data, status=201)
+
