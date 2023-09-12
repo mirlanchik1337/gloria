@@ -171,6 +171,7 @@ class PostCard(models.Model):
 
 class FontSize(models.Model):
     size = models.IntegerField(verbose_name='Размер шрифта')
+    price = models.DecimalField(verbose_name='price', decimal_places=2, max_digits=10)
 
     def __str__(self):
         return f'{self.size}'
@@ -185,7 +186,6 @@ class Balls(models.Model):
     is_cart = models.BooleanField(default=False, verbose_name='Добавление надписи к шару')
     size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=10, verbose_name='Размер шрифта')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    price = models.IntegerField(default=0, verbose_name='price')
     product = models.ManyToManyField(Product)
 
     def __str__(self):

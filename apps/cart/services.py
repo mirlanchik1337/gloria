@@ -1,15 +1,10 @@
 from django.db import transaction
 from django.db.models import Sum
-from django.utils import timezone
-from rest_framework import generics, status, request
-from rest_framework.response import Response
 from apps.cart.models import Order, CartItem, FavoriteProduct
 from apps.cart.serializers import OrderSerializer, CartItemSerializer
 from apps.product.models import Product
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.conf import settings
-from telegram import Bot
 import asyncio
 from apps.cart.models import Order, Chat
 from apps.product.services import send_notification
@@ -21,18 +16,13 @@ from django.utils import timezone
 
 
 class OrderApiService(generics.ListCreateAPIView):
-    serializer_class = OrderSerializer  # Use your Order serializer here
-
+    serializer_class = OrderSerializer
     def create(self, request, *args, **kwargs):
         user = request.user
         cart_items = CartItem.objects.filter(user=user)
         product = Product.objects.filter(user = user)
-
-        # Check if the user has cart items
         if not cart_items.exists():
             return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Validate and get the required fields from the request data
         person_name = request.data.get("person_name")
         phone_number = request.data.get("phone_number")
         type_of_order = request.data.get("type_of_order")
@@ -61,7 +51,6 @@ class OrderApiService(generics.ListCreateAPIView):
                     "type_of_order": type_of_order,
                     "order_date_time": timezone.now(),
                     "price": price,
-                    # Add other fields as needed
                 }
                 order_serializer = self.get_serializer(data=order_data)
                 order_serializer.is_valid(raise_exception=True)
@@ -84,10 +73,6 @@ class OrderApiService(generics.ListCreateAPIView):
                 order_serializer.instance.save()
 
             return Response(order_serializer.data, status=status.HTTP_201_CREATED)
-
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -175,11 +160,8 @@ class CartItemListViewService(generics.ListCreateAPIView):
 
     def list(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
-        # Фильтруем объекты, чтобы убедиться, что они существуют в базе данных
         cart_items = [item for item in cart_items if CartItem.objects.filter(pk=item.id).exists()]
-        # Сериализуем данные cart_items
         serializer = self.get_serializer(cart_items, many=True)
-        # Возвращаем только данные cart_items без обертки
         return Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
@@ -190,7 +172,6 @@ class CartItemListViewService(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         data = request.data
         quantity = int(data.get('quantity', 1))
-        # Проверяем, существует ли объект с указанным id в корзине пользователя
         product = data.get('product')
         existing_item = CartItem.objects.filter(user=request.user, product=product).first()
 
@@ -200,7 +181,7 @@ class CartItemListViewService(generics.ListCreateAPIView):
             serializer = self.get_serializer(existing_item)
             return Response(serializer.data)
         else:
-            data['quantity'] = quantity  # Устанавливаем значение quantity в переданное значение или 1
+            data['quantity'] = quantity
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)

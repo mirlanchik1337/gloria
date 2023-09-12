@@ -6,9 +6,11 @@ from telegram import Bot
 import asyncio
 from apps.cart.models import Order, CartItem, Product, Chat
 
+
 async def send_notification(chat_id, message):
     bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
     await bot.send_message(chat_id=chat_id, text=message)
+
 
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
 def send_order_notification(sender, instance, created, **kwargs):
@@ -32,8 +34,8 @@ def send_order_notification(sender, instance, created, **kwargs):
             message += f"Этаж и код от домофона: {instance.floor_and_code}\n"
         if instance.additional_to_order:
             message += f"Доп инфо к заказу: {instance.additional_to_order}\n"
-
-        message += f"Цена: {instance.price} сом\n"
+        order = Order.price
+        message += f"Цена: {int(order.price)} сом\n"
         message += f"Транспорт: {instance.transport}"
 
         # Отправляем уведомление владельцу бота
