@@ -15,18 +15,30 @@ from django.db import transaction
 from django.utils import timezone
 
 
+def calculate_order_volume(cart_items):
+    order_volume = 0
+
+    for cart_item in cart_items:
+        product_volume = cart_item.product.volume
+        quantity = cart_item.quantity
+        order_volume += product_volume * quantity
+
+    return order_volume
+
+
 class OrderApiService(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
+
     def create(self, request, *args, **kwargs):
         user = request.user
         cart_items = CartItem.objects.filter(user=user)
-        product = Product.objects.filter(user = user)
         if not cart_items.exists():
             return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+
         person_name = request.data.get("person_name")
         phone_number = request.data.get("phone_number")
         type_of_order = request.data.get("type_of_order")
-        postcard= product.postcard_set
+        order_volume = calculate_order_volume(cart_items)  # Вызываем функцию для расчета объема заказа
 
         if not person_name or not phone_number or not type_of_order:
             return Response({"error": "person_name, phone_number, and type_of_order are required fields"},
@@ -40,7 +52,21 @@ class OrderApiService(generics.ListCreateAPIView):
 
         # Calculate the total price
         price = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
-        price += postcard.price * len(postcard)
+
+        # Get all postcards associated with products in the cart and add their prices to the total
+        from apps.product.models import PostCard
+        postcards = PostCard.objects.filter(product__in=cart_items.values_list('product', flat=True))
+        price += sum(postcard.price for postcard in postcards)
+
+        # Calculate transport cost by passing the required arguments
+        distance_km = 50  # Замените на фактическое расстояние
+        delivery_method = "express"  # Замените на способ доставки
+        from apps.product.models import Transport
+
+        transport_cost = Transport.is_suitable_for_order
+        if transport_cost == True:
+        # Add transport cost to the total price
+            price += transport_cost
 
         try:
             with transaction.atomic():
@@ -76,6 +102,16 @@ class OrderApiService(generics.ListCreateAPIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def calculate_order_volume(self, cart_items):
+        order_volume = 0
+
+        for cart_item in cart_items:
+            product_volume = cart_item.product.volume
+            quantity = cart_item.quantity
+            order_volume += product_volume * quantity
+
+        return order_volume
 
 
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
@@ -186,4 +222,3 @@ class CartItemListViewService(generics.ListCreateAPIView):
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
             return Response(serializer.data, status=201)
-
