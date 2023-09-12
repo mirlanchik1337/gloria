@@ -54,7 +54,6 @@ class OrderApiService(generics.ListCreateAPIView):
 
         try:
             with transaction.atomic():
-                # Create the order
                 order_data = {
                     "user": user,
                     "person_name": person_name,
@@ -201,7 +200,7 @@ class CartItemListViewService(generics.ListCreateAPIView):
             serializer = self.get_serializer(existing_item)
             return Response(serializer.data)
         else:
-            data['quantity'] = quantity + 1   # Устанавливаем значение quantity в переданное значение или 1
+            data['quantity'] = quantity  # Устанавливаем значение quantity в переданное значение или 1
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
