@@ -19,6 +19,7 @@ from rest_framework import generics
 from django.db import transaction
 from django.utils import timezone
 
+
 class OrderApiService(generics.ListCreateAPIView):
     serializer_class = OrderSerializer  # Use your Order serializer here
 
@@ -88,6 +89,8 @@ class OrderApiService(generics.ListCreateAPIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
 def send_order_notification(sender, instance, created, **kwargs):
     if created:
@@ -184,18 +187,18 @@ class CartItemListViewService(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        quantity = int(data.get('quantity', 1))
         # Проверяем, существует ли объект с указанным id в корзине пользователя
         product = data.get('product')
         existing_item = CartItem.objects.filter(user=request.user, product=product).first()
 
         if existing_item:
-            # Если объект уже существует в корзине, увеличиваем его количество на 1
-            existing_item.quantity += 1
+            existing_item.quantity += quantity  # Прибавляем к существующему количеству значение quantity
             existing_item.save()
             serializer = self.get_serializer(existing_item)
             return Response(serializer.data)
         else:
-            # Если объекта нет в корзине, создаем новый объект
+            data['quantity'] = quantity + 1   # Устанавливаем значение quantity в переданное значение или 1
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=request.user)
