@@ -34,8 +34,7 @@ def send_order_notification(sender, instance, created, **kwargs):
             message += f"Этаж и код от домофона: {instance.floor_and_code}\n"
         if instance.additional_to_order:
             message += f"Доп инфо к заказу: {instance.additional_to_order}\n"
-        order = Order.price
-        message += f"Цена: {int(order.price)} сом\n"
+        message += f"Цена: {instance.price} сом\n"
         message += f"Транспорт: {instance.transport}"
 
         # Отправляем уведомление владельцу бота

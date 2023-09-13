@@ -156,7 +156,6 @@ class PostCardPrice(models.Model):
 
 class PostCard(models.Model):
     text = models.CharField(max_length=100, null=True, blank=True, verbose_name='Текст на открытке для букетов')
-    is_cart = models.BooleanField(verbose_name='Добавление открытки к букету')
     price = models.ForeignKey(PostCardPrice, on_delete=models.CASCADE, default=25, verbose_name='Цена открытки')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     product = models.ManyToManyField(Product)

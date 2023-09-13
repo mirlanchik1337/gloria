@@ -123,6 +123,7 @@ class OrderSerializer(serializers.ModelSerializer):
     price = CartItemSerializer(read_only=True, source='cart_items.product.price')
     order = OrderSerializer(read_only=True, source='cart_item.order')
     total_cart_price = serializers.SerializerMethodField()
+    postcard = serializers.SerializerMethodField(read_only=True, source='cart.product.postcard')
 
     class Meta:
         model = Order
@@ -135,6 +136,10 @@ class OrderSerializer(serializers.ModelSerializer):
             total_price += cart_item.product.price * cart_item.quantity
         return total_price
 
+    def get_postcard(self, order):
+        # Ваш код для получения почтовых карт, связанных с данным заказом
+        # Например, если у заказа есть поле postcards, вы можете вернуть их так:
+        return PricePostCardSerializer(order.postcard.price ,  many=True).data
 
 class TransportSerializer(serializers.ModelSerializer):
     class Meta:
