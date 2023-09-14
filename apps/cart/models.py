@@ -39,7 +39,7 @@ class FavoriteProduct(models.Model):
 class Banners(models.Model):
     image = models.ImageField()
     created_at = models.DateTimeField(auto_now=True)
-    link = models.CharField(default="http://127.0.0.1:8000/api/v1/categories/", max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.image}'

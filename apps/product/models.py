@@ -74,7 +74,7 @@ class Product(models.Model):
     is_hit = models.BooleanField(default=False, verbose_name='Хит товар')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
-    quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара', default=0)
+    product_quantity = models.IntegerField(null=True, blank=True, verbose_name='Кол-во товара', default=0)
     categories = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name='Категория товара')
     subcategories = models.ForeignKey(Subcategory, on_delete=models.CASCADE, verbose_name='Подкатегория товара',
                                       null=True, blank=True)
@@ -155,7 +155,7 @@ class PostCardPrice(models.Model):
 
 
 class PostCard(models.Model):
-    text = models.CharField(max_length=100, null=True, blank=True, verbose_name='Текст на открытке для букетов')
+    text = models.CharField(max_length=100, verbose_name='Текст на открытке для букетов')
     price = models.ForeignKey(PostCardPrice, on_delete=models.CASCADE, default=25, verbose_name='Цена открытки')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     product = models.ManyToManyField(Product)
