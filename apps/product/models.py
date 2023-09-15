@@ -190,7 +190,7 @@ class Balls(models.Model):
                                          blank=True)
 
     def __str__(self):
-        return f'{self.user}_{self.text}_{self.product.name}'
+        return f'{self.user}_{self.text}'
 
     class Meta:
         verbose_name = "Надпись на Шаре"

@@ -91,7 +91,6 @@ class FavoriteSerializer(serializers.ModelSerializer):
             'product_slug': instance.product.product_slug,
             'description': instance.product.description,
             'is_hit': instance.product.is_hit,
-            'quantity': instance.product.quantity,
         }
         representation.update(product_representation)
         return representation
