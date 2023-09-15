@@ -11,6 +11,7 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         verbose_name = "Корзина"
         verbose_name_plural = "Корзина"

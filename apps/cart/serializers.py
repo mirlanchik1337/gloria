@@ -14,6 +14,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     categories = serializers.SerializerMethodField()
     subcategories = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
+    product_quantity = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
@@ -60,6 +61,9 @@ class CartItemSerializer(serializers.ModelSerializer):
             total_price += balls_price
         return total_price
 
+    def get_product_quantity(self, obj):
+        return obj.product.product_quantity
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         cart_representation = {
@@ -74,6 +78,8 @@ class CartItemSerializer(serializers.ModelSerializer):
         }
         representation.update(cart_representation)
         return representation
+
+
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -137,6 +143,7 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
         ref_name = 'ProductOrder'
+
     def get_extra_price(self):
         extra_price = 0
         for cart_item in self.instance.cartitem_set.all():
