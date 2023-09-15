@@ -4,6 +4,7 @@ import pytils
 from .utils import path_and_rename, path_and_rename2, path_and_rename3, path_and_rename4
 
 
+
 class Category(models.Model):
     name = models.CharField(max_length=50, verbose_name='Название категории')
     image = models.ImageField(help_text="Загрузите картинку для категории",
@@ -158,7 +159,7 @@ class PostCard(models.Model):
     text = models.CharField(max_length=100, verbose_name='Текст на открытке для букетов')
     price = models.ForeignKey(PostCardPrice, on_delete=models.CASCADE, default=25, verbose_name='Цена открытки')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    product = models.ManyToManyField(Product)
+    cart_item_postcard = models.ForeignKey(Product , on_delete=models.CASCADE, verbose_name='post_card_product')
 
     def __str__(self):
         return f'{self.user}_{self.text}_{self.pk}_{self.price}'
@@ -185,7 +186,7 @@ class Balls(models.Model):
     is_cart = models.BooleanField(default=False, verbose_name='Добавление надписи к шару')
     size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=10, verbose_name='Размер шрифта')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    product = models.ManyToManyField(Product)
+    cart_items_balls = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='cart_items_balls')
 
     def __str__(self):
         return f'{self.user}_{self.text}_{self.product.name}'

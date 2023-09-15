@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import FavoriteProduct, Order, Filial
 from apps.cart.models import CartItem, Banners
 from ..product.models import Transport, PostCardPrice, FontSize
-from ..product.serializers import ProductImageSerializer, OrderSerializer
+from ..product.serializers import ProductImageSerializer
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -117,18 +117,32 @@ class CartOrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OrderCartSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     cart_items = CartItemSerializer(many=True, source='cartitem_set', read_only=True)
     price = CartItemSerializer(read_only=True, source='cart_items.product.price')
-    order = OrderSerializer(read_only=True, source='cart_item.order')
+    order = OrderCartSerializer(read_only=True, source='cart_item.order')
     total_cart_price = serializers.SerializerMethodField()
-    postcard = serializers.SerializerMethodField(read_only=True, source='cart.product.postcard')
+    postcard = serializers.SerializerMethodField(read_only=True, source='cart.postcard')
+    extra_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
         fields = '__all__'
         ref_name = 'ProductOrder'
+    def get_extra_price(self):
+        extra_price = 0
+        for cart_item in self.instance.cartitem_set.all():
+            extra_price += cart_item.postcard.price * len(cart_item.postcard)
+        return extra_price
 
     def get_total_cart_price(self, obj):
         total_price = 0
@@ -139,7 +153,8 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_postcard(self, order):
         # Ваш код для получения почтовых карт, связанных с данным заказом
         # Например, если у заказа есть поле postcards, вы можете вернуть их так:
-        return PricePostCardSerializer(order.postcard.price ,  many=True).data
+        return PricePostCardSerializer(order.postcard.price, many=True).data
+
 
 class TransportSerializer(serializers.ModelSerializer):
     class Meta:

@@ -62,11 +62,10 @@ class OrderApiService(generics.ListCreateAPIView):
         distance_km = 50  # Замените на фактическое расстояние
         delivery_method = "express"  # Замените на способ доставки
         from apps.product.models import Transport
-
+        transport_price = Transport.price
         transport_cost = Transport.is_suitable_for_order
         if transport_cost == True:
-        # Add transport cost to the total price
-            price += transport_cost
+            price += transport_price
 
         try:
             with transaction.atomic():

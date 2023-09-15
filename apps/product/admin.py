@@ -7,15 +7,18 @@ from apps.product.models import (Product, Category,
 
 from django.contrib import admin
 
+
 class BallsInline(admin.TabularInline):
     model = Balls
     min_num = 1
     max_num = 10
 
+
 class PostCardInline(admin.TabularInline):
     model = PostCard
-    min_num = 1
-    max_num = 10
+
+
+
 class ProductImageInline(admin.TabularInline):
     model = ImageModel
     min_num = 1
@@ -24,11 +27,11 @@ class ProductImageInline(admin.TabularInline):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'description', 'is_hit', 'categories')
+    list_display = ('name', 'price', 'description', 'is_hit', 'categories' )
     list_filter = ('price', 'categories')
     search_fields = ('name', 'description')
     prepopulated_fields = {'product_slug': ('name',)}
-    inlines = (ProductImageInline,)
+    inlines = (ProductImageInline, PostCardInline , BallsInline)
 
     class Meta:
         ordering = ('name', 'price')
@@ -66,6 +69,7 @@ class SecondSubcategoryAdmin(admin.ModelAdmin):
 class TransportAdmin(admin.ModelAdmin):
     list_display = ('model', 'price', 'min_volume', 'max_volume')
 
+
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Subcategory, SubcategoryAdmin)
@@ -79,4 +83,3 @@ admin.site.register(PostCardPrice)
 admin.site.register(Balls)
 admin.site.register(FontSize)
 admin.site.register(Transport, TransportAdmin)
-

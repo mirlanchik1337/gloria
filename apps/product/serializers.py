@@ -118,10 +118,3 @@ class CartItemForOrderSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class OrderSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
-    class Meta:
-        model = Order
-        fields = '__all__'
-
