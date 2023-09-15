@@ -111,10 +111,13 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class BannerSerializer(serializers.ModelSerializer):
+    category_name = serializers.SerializerMethodField()
     class Meta:
         model = Banners
         fields = '__all__'
 
+    def get_category_name(self, obj):
+        return f"{obj.category.name}"
 
 class CartOrderSerializer(serializers.ModelSerializer):
     class Meta:
