@@ -19,10 +19,8 @@ class CartItem(models.Model):
     def __str__(self):
         if self.product:
             return f"{self.product.name}"
-        elif self.postcard:
-            return f"{self.postcard.text}"
-        elif self.balls:
-            return f"{self.balls.text}"
+        else:
+            return 'product'
 
 
 class FavoriteProduct(models.Model):

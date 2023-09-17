@@ -15,6 +15,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     subcategories = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
     product_quantity = serializers.SerializerMethodField()
+    extra_price = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
@@ -48,18 +49,38 @@ class CartItemSerializer(serializers.ModelSerializer):
         if obj.product and obj.product.subcategories:
             return obj.product.subcategories.id
 
+    def get_extra_price(self, obj):
+        extra_price = 0
+
+        # Учитываем цену открыток, если они есть
+        if obj.product and hasattr(obj.product, 'postcard_set'):
+            for postcard in obj.product.postcard_set.all():
+                postcard_price = postcard.price.price * obj.quantity  # Use the price attribute of PostCardPrice
+                extra_price += postcard_price
+
+        # Учитываем цену шаров, если они есть
+        if obj.product and hasattr(obj.product, 'balls_set'):
+            for balls in obj.product.balls_set.all():
+                balls_price = balls.size.price * obj.quantity  # Use the price attribute of PostCardPrice
+                extra_price += balls_price
+        return extra_price
+
     def get_total_price(self, obj):
         total_price = 0
+
+        # Calculate total price based on the selected product
         if obj.product:
-            product_price = obj.product.price * obj.quantity
-            total_price += product_price
+            total_price += obj.product.price * obj.quantity
         elif obj.postcard:
-            postcard_price = obj.postcard.price * obj.quantity
-            total_price += postcard_price
+            total_price += obj.postcard.price * obj.quantity
         elif obj.balls:
-            balls_price = obj.balls.price * obj.quantity
-            total_price += balls_price
+            total_price += obj.balls.price * obj.quantity
+
+        # Add the extra price to the total price
+        total_price += self.get_extra_price(obj)
+
         return total_price
+
 
     def get_product_quantity(self, obj):
         return obj.product.product_quantity
@@ -75,11 +96,11 @@ class CartItemSerializer(serializers.ModelSerializer):
             'is_hit': instance.product.is_hit if instance.product else None,
             'categories': instance.product.categories.id if instance.product and instance.product.categories else None,
             'subcategories': instance.product.subcategories.id if instance.product and instance.product.subcategories else None,
+            'product_quantity': instance.product.product_quantity if instance.product else None,
+
         }
         representation.update(cart_representation)
         return representation
-
-
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -112,12 +133,14 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 class BannerSerializer(serializers.ModelSerializer):
     category_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Banners
         fields = '__all__'
 
     def get_category_name(self, obj):
         return f"{obj.category.name}"
+
 
 class CartOrderSerializer(serializers.ModelSerializer):
     class Meta:
