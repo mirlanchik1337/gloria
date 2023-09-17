@@ -81,9 +81,10 @@ class CartItemSerializer(serializers.ModelSerializer):
 
         return total_price
 
-
     def get_product_quantity(self, obj):
         return obj.product.product_quantity
+
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
