@@ -17,6 +17,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     product_quantity = serializers.SerializerMethodField()
     extra_price = serializers.SerializerMethodField()
 
+
     class Meta:
         model = CartItem
         fields = "__all__"
@@ -52,17 +53,17 @@ class CartItemSerializer(serializers.ModelSerializer):
     def get_extra_price(self, obj):
         extra_price = 0
 
-        # Учитываем цену открыток, если они есть
-        if obj.product and hasattr(obj.product, 'postcard_set'):
-            for postcard in obj.product.postcard_set.all():
-                postcard_price = postcard.price.price * obj.quantity  # Use the price attribute of PostCardPrice
-                extra_price += postcard_price
+        # Get the user from the context
+        user = self.context['request'].user
 
-        # Учитываем цену шаров, если они есть
-        if obj.product and hasattr(obj.product, 'balls_set'):
-            for balls in obj.product.balls_set.all():
-                balls_price = balls.size.price * obj.quantity  # Use the price attribute of PostCardPrice
-                extra_price += balls_price
+        # Check if the user is authenticated
+        if user.is_authenticated:
+            # Check if obj.product has postcards and calculate the price based on user-specific information
+            if obj.product and hasattr(obj.product, 'postcard_set'):
+                for postcard in obj.product.postcard_set.all():
+                    # Assuming you have a method to get user-specific postcard price, replace 'get_user_specific_postcard_price' with that method
+                    postcard_price = postcard.price.price * obj.quantity
+                    extra_price += postcard_price
         return extra_price
 
     def get_total_price(self, obj):
