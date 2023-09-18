@@ -3,6 +3,7 @@ from .models import FavoriteProduct, Order, Filial
 from apps.cart.models import CartItem, Banners
 from ..product.models import Transport, PostCardPrice, FontSize
 from ..product.serializers import ProductImageSerializer
+from ..product.serializers import BalloonsSerializer, PostCardSerializer
 
 
 class CartItemSerializer(serializers.ModelSerializer):
@@ -16,7 +17,8 @@ class CartItemSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
     product_quantity = serializers.SerializerMethodField()
     extra_price = serializers.SerializerMethodField()
-
+    balls = BalloonsSerializer(many=True , read_only=True)
+    postcard = PostCardSerializer(many=True ,read_only=True)
 
     class Meta:
         model = CartItem
@@ -85,8 +87,6 @@ class CartItemSerializer(serializers.ModelSerializer):
     def get_product_quantity(self, obj):
         return obj.product.product_quantity
 
-
-
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         cart_representation = {
@@ -99,6 +99,8 @@ class CartItemSerializer(serializers.ModelSerializer):
             'categories': instance.product.categories.id if instance.product and instance.product.categories else None,
             'subcategories': instance.product.subcategories.id if instance.product and instance.product.subcategories else None,
             'product_quantity': instance.product.product_quantity if instance.product else None,
+            'balls': BalloonsSerializer(instance.product.balls_set.all(), many=True).data if instance.product.balls_set.exists() else None,
+            'postcard': PostCardSerializer(instance.product.postcard_set.all(), many=True).data if instance.product.postcard_set.exists() else None,
 
         }
         representation.update(cart_representation)
