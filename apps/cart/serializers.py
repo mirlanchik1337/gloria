@@ -17,8 +17,8 @@ class CartItemSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
     product_quantity = serializers.SerializerMethodField()
     extra_price = serializers.SerializerMethodField()
-    balls = BalloonsSerializer(many=True , read_only=True)
-    postcard = PostCardSerializer(many=True ,read_only=True)
+    balls = BalloonsSerializer(many=True, read_only=True)
+    postcard = PostCardSerializer(many=True, read_only=True)
 
     class Meta:
         model = CartItem
@@ -99,8 +99,10 @@ class CartItemSerializer(serializers.ModelSerializer):
             'categories': instance.product.categories.id if instance.product and instance.product.categories else None,
             'subcategories': instance.product.subcategories.id if instance.product and instance.product.subcategories else None,
             'product_quantity': instance.product.product_quantity if instance.product else None,
-            'balls': BalloonsSerializer(instance.product.balls_set.all(), many=True).data if instance.product.balls_set.exists() else None,
-            'postcard': PostCardSerializer(instance.product.postcard_set.all(), many=True).data if instance.product.postcard_set.exists() else None,
+            'balls': BalloonsSerializer(instance.product.balls_set.all(),
+                                        many=True).data if instance.product.balls_set.exists() else None,
+            'postcard': PostCardSerializer(instance.product.postcard_set.all(),
+                                           many=True).data if instance.product.postcard_set.exists() else None,
 
         }
         representation.update(cart_representation)
@@ -166,30 +168,19 @@ class OrderSerializer(serializers.ModelSerializer):
     price = CartItemSerializer(read_only=True, source='cart_items.product.price')
     order = OrderCartSerializer(read_only=True, source='cart_item.order')
     total_cart_price = serializers.SerializerMethodField()
-    postcard = serializers.SerializerMethodField(read_only=True, source='cart.postcard')
-    extra_price = serializers.SerializerMethodField()
+    postcard = PostCardSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
         fields = '__all__'
         ref_name = 'ProductOrder'
 
-    def get_extra_price(self):
-        extra_price = 0
-        for cart_item in self.instance.cartitem_set.all():
-            extra_price += cart_item.postcard.price * len(cart_item.postcard)
-        return extra_price
-
     def get_total_cart_price(self, obj):
         total_price = 0
         for cart_item in obj.cartitem_set.all():
             total_price += cart_item.product.price * cart_item.quantity
+            total_price += int(obj.transport.price)
         return total_price
-
-    def get_postcard(self, order):
-        # Ваш код для получения почтовых карт, связанных с данным заказом
-        # Например, если у заказа есть поле postcards, вы можете вернуть их так:
-        return PricePostCardSerializer(order.postcard.price, many=True).data
 
 
 class TransportSerializer(serializers.ModelSerializer):
