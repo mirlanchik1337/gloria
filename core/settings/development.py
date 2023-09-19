@@ -40,7 +40,7 @@ SIMPLE_JWT = {
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = 'media/'
-STATICFILES_DIRS = [ BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "media/static"]
 
 
 CORS_ORIGIN_ALLOW_ALL = True

@@ -140,7 +140,7 @@ DATABASES = {
 DATE_FORMAT = '%d.%m.%Y'
 DATETIME_FORMAT = '%d.%m.%Y. %H:%M'
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'media/static')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
 
