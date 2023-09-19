@@ -86,6 +86,12 @@ class OrderDetailApiView(services.OrderDetailServiceApiView):
     serializer_class = serializers.OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
+class OrderHistoryApiView(generics.ListAPIView):
+    queryset = Order.objects.all()
+    serializer_class = serializers.OrderSerializer
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
 
 
 class HistoryOrderApiView(generics.ListAPIView):
