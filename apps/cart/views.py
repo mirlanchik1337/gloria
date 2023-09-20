@@ -8,9 +8,6 @@ from apps.cart.permissions import IsOwnerOrReadOnly
 from ..product.models import Product, Transport, PostCardPrice, FontSize
 from ..product.permissions import IsOwner
 from ..cart import services
-from .services import send_order_notification
-from django.shortcuts import redirect
-
 
 class CartItemListView(services.CartItemListViewService):
     queryset = CartItem.objects.all()

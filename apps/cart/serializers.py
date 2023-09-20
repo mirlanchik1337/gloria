@@ -20,6 +20,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     balls = BalloonsSerializer(many=True, read_only=True)
     postcard = PostCardSerializer(many=True, read_only=True)
 
+
     class Meta:
         model = CartItem
         fields = "__all__"
@@ -63,9 +64,11 @@ class CartItemSerializer(serializers.ModelSerializer):
             # Check if obj.product has postcards and calculate the price based on user-specific information
             if obj.product and hasattr(obj.product, 'postcard_set'):
                 for postcard in obj.product.postcard_set.all():
-                    # Assuming you have a method to get user-specific postcard price, replace 'get_user_specific_postcard_price' with that method
-                    postcard_price = postcard.price.price * obj.quantity
-                    extra_price += postcard_price
+                    # Check if postcard has a price and price.price attribute before using it
+                    if hasattr(postcard, 'price') and hasattr(postcard.price, 'price'):
+                        postcard_price = postcard.price.price * obj.quantity
+                        extra_price += postcard_price
+
         return extra_price
 
     def get_total_price(self, obj):
@@ -74,10 +77,10 @@ class CartItemSerializer(serializers.ModelSerializer):
         # Calculate total price based on the selected product
         if obj.product:
             total_price += obj.product.price * obj.quantity
-        elif obj.postcard:
-            total_price += obj.postcard.price * obj.quantity
+        elif obj.product.postcard_set:
+            total_price += obj.product.postcard_set.price
         elif obj.balls:
-            total_price += obj.balls.price * obj.quantity
+            total_price += obj.product.balls_set.price * obj.quantity
 
         # Add the extra price to the total price
         total_price += self.get_extra_price(obj)

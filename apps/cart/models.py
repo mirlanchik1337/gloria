@@ -78,6 +78,11 @@ class Order(models.Model):
         ('Доставка', 'Доставка'),
         ('Самовывоз', 'Самовывоз'),
     )
+    STATUS_ORDERING = (
+        ('Отменено', 'Отменено'),
+        ('Доставлено', 'Доставлено'),
+        ('В Обработке', 'В Обработке'),
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     person_name = models.CharField(max_length=100, verbose_name='Имя заказчика')
     phone_number = models.CharField(max_length=15, verbose_name='Номер телефона')
@@ -92,6 +97,8 @@ class Order(models.Model):
     additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
     transport = models.ForeignKey(Transport, default=1 ,on_delete=models.SET_DEFAULT, verbose_name='Транспорт')
     price = models.PositiveIntegerField(null=True, blank=True)
+    status_order = models.CharField(max_length=140 , choices=STATUS_ORDERING, blank=True, null=True)
+
 
     def __str__(self):
         return f'{self.person_name}'

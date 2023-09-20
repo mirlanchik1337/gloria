@@ -11,27 +11,38 @@ from django.contrib import admin
 class BallsInline(admin.TabularInline):
     model = Balls
     min_num = 1
-    max_num = 10
+    max_num = 1
+    extra = 0
+
+    def __init__(self, *args, **kwargs):
+        super(BallsInline, self).__init__(*args, **kwargs)
+        self.extra = 1
 
 
 class PostCardInline(admin.TabularInline):
     model = PostCard
+    min_num = 1
+    max_num = 10
+    extra = 0
 
+    def __init__(self, *args, **kwargs):
+        super(PostCardInline, self).__init__(*args, **kwargs)
+        self.extra = 1
 
 
 class ProductImageInline(admin.TabularInline):
     model = ImageModel
     min_num = 1
-    max_num = 4
-    extra = 0
+    max_num = 10
+    extra = 1
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'description', 'is_hit', 'categories' )
+    list_display = ('name', 'price', 'description', 'is_hit', 'categories')
     list_filter = ('price', 'categories')
     search_fields = ('name', 'description')
     prepopulated_fields = {'product_slug': ('name',)}
-    inlines = (ProductImageInline, PostCardInline , BallsInline)
+    inlines = (ProductImageInline, PostCardInline, BallsInline)
 
     class Meta:
         ordering = ('name', 'price')
