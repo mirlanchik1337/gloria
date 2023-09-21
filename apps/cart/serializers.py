@@ -170,8 +170,8 @@ class OrderSerializer(serializers.ModelSerializer):
     cart_items = CartItemSerializer(many=True, source='cartitem_set', read_only=True)
     price = CartItemSerializer(read_only=True, source='cart_items.product.price')
     order = OrderCartSerializer(read_only=True, source='cart_item.order')
-    total_cart_price = serializers.SerializerMethodField()
     postcard = PostCardSerializer(many=True, read_only=True)
+    total_cart_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Order

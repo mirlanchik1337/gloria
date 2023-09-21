@@ -100,6 +100,9 @@ class ImageModel(models.Model):
     image = models.ImageField(upload_to=path_and_rename)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
 
+    class Meta:
+        verbose_name = "Изображение"
+        verbose_name_plural = "Изображение"
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')

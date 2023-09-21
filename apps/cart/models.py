@@ -98,7 +98,7 @@ class Order(models.Model):
     transport = models.ForeignKey(Transport, default=1 ,on_delete=models.SET_DEFAULT, verbose_name='Транспорт')
     price = models.PositiveIntegerField(null=True, blank=True)
     status_order = models.CharField(max_length=140 , choices=STATUS_ORDERING, blank=True, null=True)
-
+    total_cart_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return f'{self.person_name}'
