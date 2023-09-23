@@ -23,27 +23,33 @@ def calculate_order_volume(cart_items):
     return order_volume
 
 
+from django.db import transaction
+
 
 class OrderApiService(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
 
     def post(self, request, *args, **kwargs):
-        # Получить данные из запроса и передать их сериализатору
         serializer = self.get_serializer(data=request.data)
 
-        # Проверить валидность данных
         if serializer.is_valid():
-            order = Order.objects.filter(user=request.user)
-            if order.cart_items.count() == 0:
-                return Response({"error": "Корзина пуста. Создание заказа невозможно."}, status=status.HTTP_400_BAD_REQUEST)
+            with transaction.atomic():
+                # Проверяем наличие товаров в корзине
+                user = request.user
+                order = Order.objects.filter(user=user).first()
 
-            # Сохранить объект Order
-            serializer.save()
+                if not order:
+                    return Response({"error": "Корзина пуста. Создание заказа невозможно."},
+                                    status=status.HTTP_400_BAD_REQUEST)
 
-            # Вернуть успешный ответ
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                # Сохраняем заказ
+                serializer.save()
 
-        # Вернуть ошибку в случае невалидных данных
+                # Очищаем корзину пользователя
+                order.cartitem_set.all().delete()
+
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -52,9 +58,9 @@ class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
         user = request.user
         orders = Order.objects.filter(user=user)
         serializer = OrderSerializer(orders, many=True)
-        total_price = orders.aggregate(Sum('cart_items__price'))['cart_items__price__sum']
-        return Response({"total_price": total_price, "details": serializer.data}, status=status.HTTP_200_OK)
+        total_price = orders.aggregate(total_price=Sum('cartitem__price'))['total_price']
 
+        return Response({"total_price": total_price, "details": serializer.data}, status=status.HTTP_200_OK)
 
 class FavoriteItemListService(generics.ListCreateAPIView):
     def get_queryset(self):
@@ -80,27 +86,21 @@ class FavoriteItemListService(generics.ListCreateAPIView):
 class FavoriteItemDetailViewService(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
-
-
 class CartItemListViewService(generics.ListCreateAPIView):
     serializer_class = CartItemSerializer
 
     def get_queryset(self):
         return CartItem.objects.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
     def list(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
-        cart_items = [item for item in cart_items if CartItem.objects.filter(pk=item.id).exists()]
         serializer = self.get_serializer(cart_items, many=True)
         return Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
         cart_items = self.get_queryset()
         cart_items.delete()
-        return Response({"message": "Все объекты из корзины были успешно удалены."})
+        return Response({"message": "All objects in the cart have been successfully deleted."})
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -109,18 +109,20 @@ class CartItemListViewService(generics.ListCreateAPIView):
         existing_item = CartItem.objects.filter(user=request.user, product=product).first()
 
         if existing_item:
-            existing_item.quantity += quantity  # Прибавляем к существующему количеству значение quantity
+            existing_item.quantity += quantity
             existing_item.save()
             serializer = self.get_serializer(existing_item)
             return Response(serializer.data)
         else:
             data['quantity'] = quantity
+            data['user'] = request.user.id  # Set the user for the new cart item
             serializer = self.get_serializer(data=data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=201)
 
-
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 async def send_notification(chat_id, message):
     bot = Bot(token="6470236178:AAEvFdGt-NrVR6gAEI_bdWLbjdLC81ZigEE")
@@ -149,7 +151,7 @@ def send_order_notification(sender, instance, created, **kwargs):
             message += f"Этаж и код от домофона: {instance.floor_and_code}\n"
         if instance.additional_to_order:
             message += f"Доп инфо к заказу: {instance.additional_to_order}\n"
-        message += f"Цена: {instance.total_price} сом\n"
+        message += f"Цена: {instance.total_cart_price} сом\n"
         message += f"Транспорт: {instance.transport}"
 
         try:

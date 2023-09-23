@@ -21,6 +21,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     postcard = PostCardSerializer(many=True, read_only=True)
 
 
+
     class Meta:
         model = CartItem
         fields = "__all__"
@@ -71,6 +72,22 @@ class CartItemSerializer(serializers.ModelSerializer):
 
         return extra_price
 
+
+    def update(self, instance, validated_data):
+        # Получите количество товара на складе
+        available_quantity = instance.product.product_quantity if instance.product else 0
+
+        # Получите новое количество товара из запроса
+        new_quantity = validated_data.get('quantity', instance.quantity)
+
+        # Если новое количество больше, чем доступное количество, установите количество на максимально доступное
+        if new_quantity > available_quantity:
+            new_quantity = available_quantity
+
+        instance.quantity = new_quantity
+        instance.save()
+
+        return instance
     def get_total_price(self, obj):
         total_price = 0
 

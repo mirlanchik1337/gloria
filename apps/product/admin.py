@@ -10,9 +10,9 @@ from django.contrib import admin
 
 class BallsInline(admin.TabularInline):
     model = Balls
-    min_num = 1
-    max_num = 1
-    extra = 0
+    min_num = 0
+    max_num = 100
+    extra = 1
 
     def __init__(self, *args, **kwargs):
         super(BallsInline, self).__init__(*args, **kwargs)
@@ -22,8 +22,8 @@ class BallsInline(admin.TabularInline):
 class PostCardInline(admin.TabularInline):
     model = PostCard
     min_num = 1
-    max_num = 10
-    extra = 0
+    max_num = 1
+    extra = 1
 
     def __init__(self, *args, **kwargs):
         super(PostCardInline, self).__init__(*args, **kwargs)
@@ -33,7 +33,7 @@ class PostCardInline(admin.TabularInline):
 class ProductImageInline(admin.TabularInline):
     model = ImageModel
     min_num = 1
-    max_num = 10
+    max_num = 4
     extra = 1
 
 
