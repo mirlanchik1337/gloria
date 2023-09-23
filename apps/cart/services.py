@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from apps.cart.models import Order, CartItem, FavoriteProduct
 from apps.cart.serializers import OrderSerializer, CartItemSerializer
+import requests
 
 
 def calculate_order_volume(cart_items):
@@ -124,14 +125,48 @@ class CartItemListViewService(generics.ListCreateAPIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-async def send_notification(chat_id, message):
-    bot = Bot(token="6470236178:AAEvFdGt-NrVR6gAEI_bdWLbjdLC81ZigEE")
-    await bot.send_message(chat_id=chat_id, text=message)
+
+import requests
+
+import requests
+import json
+
+
+# Define the send_notification function (replace this with your actual notification logic)
+def send_notification(message):
+    # Replace this with your notification sending code (e.g., sending an email or a push notification)
+    print(f"Sending notification: {message}")
+
+
+import requests
+import json
+
+
+# Define the send_notification function (replace this with your actual notification logic)
+def send_notification(message):
+    # Replace this with your notification sending code (e.g., sending an email or a push notification)
+    print(f"Sending notification: {message}")
 
 
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
 def send_order_notification(sender, instance, created, **kwargs):
     if created:
+        # Replace 'https://your-api-url.com/get_order_price' with the actual API URL
+        api_url = 'http://127.0.0.1:8000/api/v1/orders/'
+
+        try:
+            response = requests.get(api_url, params={'order_id': instance.id})
+
+            if response.status_code == 200:
+                price_data = response.json()
+                price = price_data.get('price')
+            else:
+                # Handle API error or price not found
+                price = 'Price not available'
+        except requests.exceptions.RequestException as e:
+            # Handle request-related errors (e.g., network issues)
+            price = 'Error fetching price from API'
+
         message = "Новый заказ!\n\n"
         message += f"Имя заказчика: {instance.person_name}\n"
         message += f"Номер телефона: {instance.phone_number}\n"
@@ -151,11 +186,11 @@ def send_order_notification(sender, instance, created, **kwargs):
             message += f"Этаж и код от домофона: {instance.floor_and_code}\n"
         if instance.additional_to_order:
             message += f"Доп инфо к заказу: {instance.additional_to_order}\n"
-        message += f"Цена: {instance.total_cart_price} сом\n"
+
+        # Include the retrieved price in the message
+        message += f"Цена: {price} сом\n"
         message += f"Транспорт: {instance.transport}"
 
-        try:
-            chat = Chat.objects.get(bot_owner=True)
-            asyncio.run(send_notification(chat.chat_id, message))
-        except Chat.DoesNotExist:
-            pass
+        # Send the notification message with the price
+        send_notification(message)
+
