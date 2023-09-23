@@ -38,12 +38,9 @@ class OrderApiService(generics.ListCreateAPIView):
                 # Проверяем наличие товаров в корзине
                 user = request.user
                 order = Order.objects.filter(user=user).first()
-
                 if not order:
                     return Response({"error": "Корзина пуста. Создание заказа невозможно."},
                                     status=status.HTTP_400_BAD_REQUEST)
-
-                # Сохраняем заказ
                 serializer.save()
 
                 # Очищаем корзину пользователя
