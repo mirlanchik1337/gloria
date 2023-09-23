@@ -1,4 +1,7 @@
+from django.db.models import Sum
 from rest_framework import serializers
+
+from . import models
 from .models import FavoriteProduct, Order, Filial
 from apps.cart.models import CartItem, Banners
 from ..product.models import Transport, PostCardPrice, FontSize
@@ -19,8 +22,6 @@ class CartItemSerializer(serializers.ModelSerializer):
     extra_price = serializers.SerializerMethodField()
     balls = BalloonsSerializer(many=True, read_only=True)
     postcard = PostCardSerializer(many=True, read_only=True)
-
-
 
     class Meta:
         model = CartItem
@@ -72,7 +73,6 @@ class CartItemSerializer(serializers.ModelSerializer):
 
         return extra_price
 
-
     def update(self, instance, validated_data):
         # Получите количество товара на складе
         available_quantity = instance.product.product_quantity if instance.product else 0
@@ -88,6 +88,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
     def get_total_price(self, obj):
         total_price = 0
 
@@ -181,12 +182,11 @@ class OrderCartSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
 
-
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     cart_items = CartItemSerializer(many=True, source='cartitem_set', read_only=True)
-    price = CartItemSerializer(read_only=True, source='cart_items.product.price')
-    order = OrderCartSerializer(read_only=True, source='cart_item.order')
+    price = serializers.SerializerMethodField()
+    order = OrderCartSerializer(read_only=True, source='cart.cartitem_set.order')
     postcard = PostCardSerializer(many=True, read_only=True)
     total_cart_price = serializers.SerializerMethodField()
 
@@ -195,11 +195,12 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
         ref_name = 'ProductOrder'
 
+    def get_price(self, obj):
+        return sum(item.product.price * item.quantity for item in obj.cartitem_set.all())
+
     def get_total_cart_price(self, obj):
-        total_price = 0
-        for cart_item in obj.cartitem_set.all():
-            total_price += cart_item.product.price * cart_item.quantity
-            total_price += int(obj.transport.price)
+        total_price = self.get_price(obj)
+        total_price += int(obj.transport.price)
         return total_price
 
 

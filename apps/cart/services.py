@@ -42,12 +42,9 @@ class OrderApiService(generics.ListCreateAPIView):
                     return Response({"error": "Корзина пуста. Создание заказа невозможно."},
                                     status=status.HTTP_400_BAD_REQUEST)
                 serializer.save()
-
-                # Очищаем корзину пользователя
+                order.save()
                 order.cartitem_set.all().delete()
-
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -59,6 +56,7 @@ class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
         total_price = orders.aggregate(total_price=Sum('cartitem__price'))['total_price']
 
         return Response({"total_price": total_price, "details": serializer.data}, status=status.HTTP_200_OK)
+
 
 class FavoriteItemListService(generics.ListCreateAPIView):
     def get_queryset(self):
@@ -84,6 +82,8 @@ class FavoriteItemListService(generics.ListCreateAPIView):
 class FavoriteItemDetailViewService(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return FavoriteProduct.objects.filter(user=self.request.user)
+
+
 class CartItemListViewService(generics.ListCreateAPIView):
     serializer_class = CartItemSerializer
 
@@ -112,8 +112,6 @@ class CartItemListViewService(generics.ListCreateAPIView):
             serializer = self.get_serializer(existing_item)
             return Response(serializer.data)
         else:
-            data['quantity'] = quantity
-            data['user'] = request.user.id  # Set the user for the new cart item
             serializer = self.get_serializer(data=data)
 
             if serializer.is_valid():
@@ -121,22 +119,6 @@ class CartItemListViewService(generics.ListCreateAPIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-import requests
-
-import requests
-import json
-
-
-# Define the send_notification function (replace this with your actual notification logic)
-def send_notification(message):
-    # Replace this with your notification sending code (e.g., sending an email or a push notification)
-    print(f"Sending notification: {message}")
-
-
-import requests
-import json
 
 
 # Define the send_notification function (replace this with your actual notification logic)
@@ -190,4 +172,3 @@ def send_order_notification(sender, instance, created, **kwargs):
 
         # Send the notification message with the price
         send_notification(message)
-
