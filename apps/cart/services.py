@@ -43,12 +43,12 @@ class OrderApiService(generics.ListCreateAPIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
-            new_order = serializer.save()
-
             # Associate each cart item with the new order
             for cart_item in cart_items:
-                cart_item.order = new_order
+                cart_item.order=new_order
                 cart_item.save()
+                new_order = serializer.save()
+                cart_items.delete()
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -111,6 +111,8 @@ class CartItemListViewService(generics.ListCreateAPIView):
         product = data.get('product')
         existing_item = CartItem.objects.filter(user=request.user, product=product).first()
 
+        if quantity > product.product_quantity:
+            return Response({"detail":"Quantity is greater than product quantity."}, status=status.HTTP_400_BAD_REQUEST)
         if existing_item:
             existing_item.quantity += quantity
             existing_item.save()
