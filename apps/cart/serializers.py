@@ -211,6 +211,7 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_cart_items(self, obj):
         # Assuming you want to serialize the cart items
         cart_items = obj.cartitem_set.all()
+        cart_items = tuple(cart_items)
         return CartItemSerializer(cart_items, many=True).data
 
     def get_price(self, obj):
