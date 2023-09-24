@@ -20,8 +20,20 @@ class CartItemSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField()
     product_quantity = serializers.SerializerMethodField()
     extra_price = serializers.SerializerMethodField()
-    balls = BalloonsSerializer(many=True, read_only=True)
-    postcard = PostCardSerializer(many=True, read_only=True)
+    balls = serializers.SerializerMethodField()
+    postcard = serializers.SerializerMethodField()
+
+    def get_postcard(self, obj):
+        if obj.product.postcard_set:
+            return obj.product.postcard_set
+
+
+    def get_balls(self, obj):
+        if obj.product.balls_set:
+            return obj.product.balls_set
+
+
+
 
     class Meta:
         model = CartItem

@@ -12,22 +12,22 @@ class BallsInline(admin.TabularInline):
     model = Balls
     min_num = 0
     max_num = 100
-    extra = 1
+    extra = 0
 
     def __init__(self, *args, **kwargs):
         super(BallsInline, self).__init__(*args, **kwargs)
-        self.extra = 1
+        self.extra = 0
 
 
 class PostCardInline(admin.TabularInline):
     model = PostCard
-    min_num = 1
-    max_num = 1
-    extra = 1
+    min_num = 0
+    max_num = 100
+    extra = 0
 
     def __init__(self, *args, **kwargs):
         super(PostCardInline, self).__init__(*args, **kwargs)
-        self.extra = 1
+        self.extra = 0
 
 
 class ProductImageInline(admin.TabularInline):

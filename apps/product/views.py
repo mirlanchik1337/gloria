@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from apps.product import filters as filtration
@@ -105,8 +107,21 @@ class PostCardViewSet(ModelViewSet):
     queryset = PostCard.objects.all()
     serializer_class = PostCardSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TitleOnBallViewSet(ModelViewSet):
     queryset = Balls.objects.all()
     serializer_class = BalloonsSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
