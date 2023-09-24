@@ -182,13 +182,26 @@ class OrderCartSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
 
+class TransportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transport
+        fields = '__all__'
+
+class FilialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Filial
+        fields = '__all__'
+
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     cart_items = CartItemSerializer(many=True, source='cartitem_set', read_only=True)
     price = serializers.SerializerMethodField()
     order = OrderCartSerializer(read_only=True, source='cart.cartitem_set.order')
     postcard = PostCardSerializer(many=True, read_only=True)
+    balls = BalloonsSerializer(many=True, read_only=True)
     total_cart_price = serializers.SerializerMethodField()
+    transport = TransportSerializer(many=False, read_only=True)
+    filial = FilialSerializer(many=False, read_only=True)
 
     class Meta:
         model = Order
@@ -204,10 +217,6 @@ class OrderSerializer(serializers.ModelSerializer):
         return total_price
 
 
-class TransportSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Transport
-        fields = '__all__'
 
 
 class PricePostCardSerializer(serializers.ModelSerializer):
@@ -216,10 +225,6 @@ class PricePostCardSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class FilialSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Filial
-        fields = '__all__'
 
 
 class FontSizeSerializer(serializers.ModelSerializer):

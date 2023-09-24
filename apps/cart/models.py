@@ -90,7 +90,7 @@ class Order(models.Model):
     as_soon_as_possible = models.BooleanField(default=False, verbose_name='Как можно скорее')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания заказа')
     filial = models.ForeignKey(Filial, default=1, on_delete=models.SET_DEFAULT)
-    order_date_time = models.DateTimeField(verbose_name='Дата и время забора заказа', auto_created=True)
+    order_date_time = models.DateTimeField(verbose_name='Дата и время забора заказа', auto_created=True, blank=True, null=True)
     address = models.CharField(max_length=100, verbose_name='Адрес', blank=True, null=True)
     apartment = models.CharField(max_length=100, verbose_name='Дом/квартира', blank=True, null=True)
     floor_and_code = models.CharField(max_length=100, verbose_name='Этаж и код от домофона', blank=True, null=True)

@@ -35,15 +35,20 @@ class OrderApiService(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             with transaction.atomic():
-                # Проверяем наличие товаров в корзине
                 user = request.user
                 order = Order.objects.filter(user=user).first()
                 if not order:
                     return Response({"error": "Корзина пуста. Создание заказа невозможно."},
                                     status=status.HTTP_400_BAD_REQUEST)
-                serializer.save()
-                order.save()
+
+                # Create a new order with the cart items
+                new_order = serializer.save()
+                new_order.cartitem_set.set(order.cartitem_set.all())
+                new_order.save()
+
+                # Clear the cart
                 order.cartitem_set.all().delete()
+
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

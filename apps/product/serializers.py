@@ -5,7 +5,7 @@ from .models import (Product, Category, Subcategory,
                      WhatsAppLink, SecondSubcategory,
                      PostCard, PostCardPrice,
                      Balls, ImageModel)
-from ..cart.models import CartItem , Order
+from ..cart.models import CartItem, Order
 
 
 class SubcategoryForCategorySerializer(serializers.ModelSerializer):
@@ -58,7 +58,6 @@ class PostCardPriceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class PostCardSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     postcard_price = PostCardPriceSerializer(read_only=True, many=False)
@@ -69,7 +68,6 @@ class PostCardSerializer(serializers.ModelSerializer):
 
 
 class BalloonsSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Balls
         fields = ['id', 'user', 'text', 'balls_size', 'price']
@@ -81,8 +79,8 @@ class ProductSerializer(serializers.ModelSerializer):
     subcategories = SubcategorySerializer(many=False)
     second_subcategories = SecondSubcategorySerializer(many=False)
     product_images = ProductImageSerializer(many=True, read_only=True)
-    postcard = PostCardSerializer(many=False, read_only=True)
-    baloons = BalloonsSerializer(many=False , read_only=True)
+    postcard = PostCardSerializer(many=True, read_only=True)
+    balls = BalloonsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -119,5 +117,3 @@ class CartItemForOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
         fields = "__all__"
-
-
