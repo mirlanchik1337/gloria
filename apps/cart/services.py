@@ -11,6 +11,7 @@ from rest_framework import generics
 from apps.cart.models import Order, CartItem, FavoriteProduct
 from apps.cart.serializers import OrderSerializer, CartItemSerializer
 import requests
+from django.db import transaction
 
 
 def calculate_order_volume(cart_items):
@@ -24,33 +25,32 @@ def calculate_order_volume(cart_items):
     return order_volume
 
 
-from django.db import transaction
-
-
 class OrderApiService(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
 
-        if serializer.is_valid():
-            with transaction.atomic():
-                user = request.user
-                order = Order.objects.filter(user=user).first()
-                if not order:
-                    return Response({"error": "Корзина пуста. Создание заказа невозможно."},
-                                    status=status.HTTP_400_BAD_REQUEST)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-                # Create a new order with the cart items
-                new_order = serializer.save()
-                new_order.cartitem_set.set(order.cartitem_set.all())
-                new_order.save()
+        user = request.user
+        cart_items = CartItem.objects.filter(user=user)
 
-                # Clear the cart
-                order.cartitem_set.all().delete()
+        if not cart_items:
+            return Response({"error": "Корзина пуста. Создание заказа невозможно."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            new_order = serializer.save()
+
+            # Associate each cart item with the new order
+            for cart_item in cart_items:
+                cart_item.order = new_order
+                cart_item.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):

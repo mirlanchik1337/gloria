@@ -27,13 +27,9 @@ class CartItemSerializer(serializers.ModelSerializer):
         if obj.product.postcard_set:
             return obj.product.postcard_set
 
-
     def get_balls(self, obj):
         if obj.product.balls_set:
             return obj.product.balls_set
-
-
-
 
     class Meta:
         model = CartItem
@@ -70,32 +66,21 @@ class CartItemSerializer(serializers.ModelSerializer):
     def get_extra_price(self, obj):
         extra_price = 0
 
-        # Get the user from the context
-        user = self.context['request'].user
-
-        # Check if the user is authenticated
-        if user.is_authenticated:
-            # Check if obj.product has postcards and calculate the price based on user-specific information
-            if obj.product and hasattr(obj.product, 'postcard_set'):
-                for postcard in obj.product.postcard_set.all():
-                    # Check if postcard has a price and price.price attribute before using it
-                    if hasattr(postcard, 'price') and hasattr(postcard.price, 'price'):
-                        postcard_price = postcard.price.price * obj.quantity
-                        extra_price += postcard_price
+        # Check if obj.product has postcards and calculate the price based on user-specific information
+        if obj.product and hasattr(obj.product, 'postcard_set'):
+            for postcard in obj.product.postcard_set.all():
+                # Check if postcard has a price and price.price attribute before using it
+                if hasattr(postcard, 'price') and hasattr(postcard.price, 'price'):
+                    postcard_price = postcard.price.price * obj.quantity
+                    extra_price += postcard_price
 
         return extra_price
 
     def update(self, instance, validated_data):
-        # Получите количество товара на складе
         available_quantity = instance.product.product_quantity if instance.product else 0
-
-        # Получите новое количество товара из запроса
         new_quantity = validated_data.get('quantity', instance.quantity)
-
-        # Если новое количество больше, чем доступное количество, установите количество на максимально доступное
         if new_quantity > available_quantity:
             new_quantity = available_quantity
-
         instance.quantity = new_quantity
         instance.save()
 
@@ -194,19 +179,22 @@ class OrderCartSerializer(serializers.ModelSerializer):
         model = Order
         fields = '__all__'
 
+
 class TransportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transport
         fields = '__all__'
+
 
 class FilialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Filial
         fields = '__all__'
 
+
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    cart_items = CartItemSerializer(many=True, source='cartitem_set', read_only=True)
+    cart_items = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
     order = OrderCartSerializer(read_only=True, source='cart.cartitem_set.order')
     postcard = PostCardSerializer(many=True, read_only=True)
@@ -220,6 +208,11 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = '__all__'
         ref_name = 'ProductOrder'
 
+    def get_cart_items(self, obj):
+        # Assuming you want to serialize the cart items
+        cart_items = obj.cartitem_set.all()
+        return CartItemSerializer(cart_items, many=True).data
+
     def get_price(self, obj):
         return sum(item.product.price * item.quantity for item in obj.cartitem_set.all())
 
@@ -229,14 +222,10 @@ class OrderSerializer(serializers.ModelSerializer):
         return total_price
 
 
-
-
 class PricePostCardSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostCardPrice
         fields = '__all__'
-
-
 
 
 class FontSizeSerializer(serializers.ModelSerializer):
