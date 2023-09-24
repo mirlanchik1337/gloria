@@ -108,11 +108,8 @@ class CartItemListViewService(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         data = request.data
         quantity = int(data.get('quantity', 1))
-        product = data.get('product')
+        product = data.get('product.product_quantity', 1)
         existing_item = CartItem.objects.filter(user=request.user, product=product).first()
-
-        if quantity > product.product_quantity:
-            return Response({"detail":"Quantity is greater than product quantity."}, status=status.HTTP_400_BAD_REQUEST)
         if existing_item:
             existing_item.quantity += quantity
             existing_item.save()

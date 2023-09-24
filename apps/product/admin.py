@@ -3,7 +3,7 @@ from apps.product.models import (Product, Category,
                                  Review, Stories, SecondSubcategory,
                                  PostCard, PostCardPrice,
                                  Balls, FontSize,
-                                 ImageModel, Transport)
+                                 ImageModel, Transport, BallsPrice)
 
 from django.contrib import admin
 
@@ -11,24 +11,13 @@ from django.contrib import admin
 class BallsInline(admin.TabularInline):
     model = Balls
     min_num = 0
-    max_num = 100
     extra = 0
-
-    def __init__(self, *args, **kwargs):
-        super(BallsInline, self).__init__(*args, **kwargs)
-        self.extra = 0
 
 
 class PostCardInline(admin.TabularInline):
     model = PostCard
     min_num = 0
-    max_num = 100
     extra = 0
-
-    def __init__(self, *args, **kwargs):
-        super(PostCardInline, self).__init__(*args, **kwargs)
-        self.extra = 0
-
 
 class ProductImageInline(admin.TabularInline):
     model = ImageModel
@@ -87,6 +76,7 @@ admin.site.register(Subcategory, SubcategoryAdmin)
 admin.site.register(Review)
 admin.site.register(QuationsAnswers)
 admin.site.register(Stories)
+admin.site.register(BallsPrice)
 admin.site.register(SecondSubcategory, SecondSubcategoryAdmin)
 admin.site.register(PostCard)
 admin.site.register(ImageModel)

@@ -58,19 +58,6 @@ class PostCardPriceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PostCardSerializer(serializers.ModelSerializer):
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    postcard_price = PostCardPriceSerializer(read_only=True, many=False)
-
-    class Meta:
-        model = PostCard
-        fields = ['id', 'user', 'text', 'price', 'postcard_price']
-
-
-class BalloonsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Balls
-        fields = ['id', 'user', 'text', 'balls_size', 'price']
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -79,11 +66,24 @@ class ProductSerializer(serializers.ModelSerializer):
     subcategories = SubcategorySerializer(many=False)
     second_subcategories = SecondSubcategorySerializer(many=False)
     product_images = ProductImageSerializer(many=True, read_only=True)
-    postcard = PostCardSerializer(many=True, read_only=True)
-    balls = BalloonsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
+        fields = '__all__'
+
+
+class PostCardSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    postcard_price = PostCardPriceSerializer(read_only=True, many=False)
+
+    class Meta:
+        model = PostCard
+        fields = "__all__"
+
+
+class BalloonsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Balls
         fields = '__all__'
 
 
