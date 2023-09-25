@@ -175,6 +175,7 @@ class PostCard(models.Model):
 
 class FontSize(models.Model):
     size = models.IntegerField(verbose_name='Размер шрифта')
+    price = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
         return f'{self.size}'
@@ -190,7 +191,7 @@ class Balls(models.Model):
     balls_size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=10, verbose_name='Размер шрифта')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='cart_items_balls')
-    price = models.DecimalField(max_digits=5, decimal_places=2)
+
 
     def __str__(self):
         return f'{self.user}_{self.text}'
