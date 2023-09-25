@@ -3,7 +3,7 @@ from apps.product.models import (Product, Category,
                                  Review, Stories, SecondSubcategory,
                                  PostCard, PostCardPrice,
                                  Balls, FontSize,
-                                 ImageModel, Transport, BallsPrice)
+                                 ImageModel, Transport)
 
 from django.contrib import admin
 
@@ -76,7 +76,6 @@ admin.site.register(Subcategory, SubcategoryAdmin)
 admin.site.register(Review)
 admin.site.register(QuationsAnswers)
 admin.site.register(Stories)
-admin.site.register(BallsPrice)
 admin.site.register(SecondSubcategory, SecondSubcategoryAdmin)
 admin.site.register(PostCard)
 admin.site.register(ImageModel)

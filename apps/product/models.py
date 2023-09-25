@@ -172,13 +172,6 @@ class PostCard(models.Model):
         verbose_name_plural = "Открытка"
 
 
-class BallsPrice(models.Model):
-    price = models.DecimalField(verbose_name='price', decimal_places=2, max_digits=10)
-
-    class Meta:
-        verbose_name = "Цена шара"
-        verbose_name_plural = "Цена шара"
-
 
 class FontSize(models.Model):
     size = models.IntegerField(verbose_name='Размер шрифта')
@@ -191,14 +184,14 @@ class FontSize(models.Model):
         verbose_name_plural = "Размеры Надписи"
 
 
-
 class Balls(models.Model):
     text = models.CharField(max_length=100, null=True, blank=True, verbose_name='Текст на шаре')
     is_cart = models.BooleanField(default=False, verbose_name='Добавление надписи к шару')
     balls_size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=10, verbose_name='Размер шрифта')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='cart_items_balls')
-    price = models.ForeignKey(BallsPrice, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+
     def __str__(self):
         return f'{self.user}_{self.text}'
 

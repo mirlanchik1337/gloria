@@ -42,15 +42,20 @@ class OrderApiService(generics.ListCreateAPIView):
             return Response({"error": "Корзина пуста. Создание заказа невозможно."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        with transaction.atomic():
-            # Associate each cart item with the new order
-            for cart_item in cart_items:
-                cart_item.order=new_order
-                cart_item.save()
-                new_order = serializer.save()
-                cart_items.delete()
+        # Create a new order
+        new_order = serializer.save()
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        with transaction.atomic():
+            for cart_item in cart_items:
+                cart_item.order = new_order
+                cart_item.save()
+
+    def delete(self, cart_items, status):
+        for cart_item in cart_items:
+            cart_item.delete()
+            cart_item.save()
+            cart_item.order = None
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
