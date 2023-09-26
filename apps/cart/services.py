@@ -160,7 +160,7 @@ def send_notification(message):
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
 def send_order_notification(sender, instance, created, **kwargs):
     if created:
-        api_url = 'http://127.0.0.1:8000/api/v1/orders/'  # Use Django settings for the API URL
+        api_url = 'https://gloria.geeks.kg/api/v1/orders/'  # Use Django settings for the API URL
 
         try:
             response = requests.post(api_url)
