@@ -79,7 +79,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
         # Calculate total price based on the selected product
         if obj.product:
-            total_price += obj.product.price
+            total_price += obj.product.price * obj.quantity
         elif obj.product.postcard_set:
             total_price += obj.product.postcard_set.price
         elif obj.balls:
