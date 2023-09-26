@@ -42,7 +42,7 @@ class ProductViewSet(ReadOnlyModelViewSet):
     ordering = ['id']
     ordering_fields = ['price']
     pagination_class = ProductLimitOffsetPagination
-    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+
 
 
 
