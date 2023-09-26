@@ -121,9 +121,11 @@ class TitleOnBallViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly]  # Используйте свой IsOwnerOrReadOnly класс
 
     def get_queryset(self):
-        # Возвращайте только объекты, которые принадлежат текущему пользователю
         return Balls.objects.filter(user=self.request.user)
 
+    def get(self):
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response(serializer.data)
     def create(self, request , *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():

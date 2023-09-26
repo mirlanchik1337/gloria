@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.db.models import Sum
+from django.db.models import Sum, Q
+
 from telegram import Bot
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -13,7 +14,7 @@ from apps.cart.serializers import OrderSerializer, CartItemSerializer
 import requests
 from django.db import transaction
 
-from apps.product.models import PostCard
+from apps.product.models import PostCard, Product
 
 
 class OrderApiService(generics.ListCreateAPIView):
@@ -97,11 +98,6 @@ class CartItemListViewService(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return CartItem.objects.filter(user=self.request.user)
-
-    def list(self, request, *args, **kwargs):
-        cart_items = self.get_queryset()
-        serializer = self.get_serializer(cart_items, many=True)
-        return Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
         cart_items = self.get_queryset()

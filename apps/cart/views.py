@@ -1,4 +1,5 @@
 from rest_framework import generics, status
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -9,6 +10,11 @@ from ..product.models import Product, Transport, PostCardPrice, FontSize
 from ..product.permissions import IsOwner
 from ..cart import services
 
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated, IsOwnerOrReadOnly])
+# def CartItemListView(request):
+#
 
 class CartItemListView(services.CartItemListViewService):
     queryset = CartItem.objects.all()

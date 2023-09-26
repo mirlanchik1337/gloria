@@ -1,12 +1,11 @@
 from apps.users.models import User
 from django.db import models
 from apps.product.models import (Product, Category,
-                                 Transport,PostCard)
-
+                                 Transport, PostCard)
 
 
 class CartItem(models.Model):
-    order = models.ForeignKey('cart.Order', on_delete=models.CASCADE , null=True, blank=True)
+    order = models.ForeignKey('cart.Order', on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -21,6 +20,14 @@ class CartItem(models.Model):
             return f"{self.product.name}"
         else:
             return 'product'
+
+    def get_balls(self):
+        if self.product and self.product.balls_set.exists():
+            return self.product.balls_set.filter(user=self.user)
+
+    def get_postcards(self, obj):
+        if obj.product and obj.product.postcard_set:
+            return self.product.postcard_set.filter(user=self.user)
 
 
 class FavoriteProduct(models.Model):
@@ -46,7 +53,6 @@ class Banners(models.Model):
     class Meta:
         verbose_name = "Баннеры"
         verbose_name_plural = "Баннеры"
-
 
 
 class Filial(models.Model):
@@ -90,19 +96,19 @@ class Order(models.Model):
     as_soon_as_possible = models.BooleanField(default=False, verbose_name='Как можно скорее')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время создания заказа')
     filial = models.ForeignKey(Filial, default=1, on_delete=models.SET_DEFAULT)
-    order_date_time = models.DateTimeField(verbose_name='Дата и время забора заказа', auto_created=True, blank=True, null=True)
+    order_date_time = models.DateTimeField(verbose_name='Дата и время забора заказа', auto_created=True, blank=True,
+                                           null=True)
     address = models.CharField(max_length=100, verbose_name='Адрес', blank=True, null=True)
     apartment = models.CharField(max_length=100, verbose_name='Дом/квартира', blank=True, null=True)
     floor_and_code = models.CharField(max_length=100, verbose_name='Этаж и код от домофона', blank=True, null=True)
     additional_to_order = models.CharField(max_length=200, verbose_name='Доп инфо к заказу', blank=True, null=True)
-    transport = models.ForeignKey(Transport, default=1 ,on_delete=models.SET_DEFAULT, verbose_name='Транспорт')
+    transport = models.ForeignKey(Transport, default=1, on_delete=models.SET_DEFAULT, verbose_name='Транспорт')
     price = models.PositiveIntegerField(null=True, blank=True)
-    status_order = models.CharField(max_length=140 , choices=STATUS_ORDERING, blank=True, null=True)
+    status_order = models.CharField(max_length=140, choices=STATUS_ORDERING, blank=True, null=True)
     total_cart_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return f'{self.person_name}'
-
 
     def select_transport(self):
         transports = Transport.objects.all()

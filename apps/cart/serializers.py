@@ -23,15 +23,14 @@ class CartItemSerializer(serializers.ModelSerializer):
     postcard = PostCardSerializer(many=True, read_only=True)
     balls = BalloonsSerializer(many=True, read_only=True)
 
-
     class Meta:
         model = CartItem
         fields = "__all__"
 
+
     def get_price(self, obj):
         if obj.product:
             return obj.product.price
-
 
     def get_product_slug(self, obj):
         return obj.product.product_slug
@@ -107,9 +106,11 @@ class CartItemSerializer(serializers.ModelSerializer):
             'subcategories': instance.product.subcategories.id if instance.product and instance.product.subcategories else None,
             'product_quantity': instance.product.product_quantity if instance.product else None,
             'balls': [
-                ball for ball in instance.product.balls_set.all() if ball.user_product == instance.user.id
+                BalloonsSerializer(instance.product.balls_set.all(),
+                                   many=True).data if instance.product.balls_set else None,
             ],
-            'postcard': PostCardSerializer(instance.product.postcard_set.all(), many=True).data if instance.product.postcard_set.exists() else None,
+            'postcard': PostCardSerializer(instance.product.postcard_set.all(),
+                                           many=True).data if instance.product.postcard_set.exists() else None,
         }
         representation.update(cart_representation)
         return representation
