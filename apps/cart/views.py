@@ -75,7 +75,7 @@ class BannersViewSet(generics.ListAPIView):
 class OrderApiView(services.OrderApiService):
     queryset = Order.objects.all()
     serializer_class = serializers.OrderSerializer
-    permission_classes = [IsAuthenticated, IsOwner]
+    permission_classes = [IsAuthenticated,IsOwnerOrReadOnly]
     lookup_field = 'id'
 
 

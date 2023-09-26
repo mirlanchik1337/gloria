@@ -16,17 +16,6 @@ from django.db import transaction
 from apps.product.models import PostCard
 
 
-def calculate_order_volume(cart_items):
-    order_volume = 0
-
-    for cart_item in cart_items:
-        product_volume = cart_item.product.volume
-        quantity = cart_item.quantity
-        order_volume += product_volume * quantity
-
-    return order_volume
-
-
 class OrderApiService(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
 
@@ -52,19 +41,26 @@ class OrderApiService(generics.ListCreateAPIView):
                 cart_item.order = new_order
                 cart_item.save()
 
-    def delete(self, cart_items, status):
+        return Response(serializer.data, status=status.HTTP_201_CREATED)  # Return a success response
+
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        cart_items = CartItem.objects.filter(user=user)
+
+        if not cart_items:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         for cart_item in cart_items:
             cart_item.delete()
-            cart_item.save()
-            cart_item.order = None
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)  # Return a success response
 
 
 class OrderDetailServiceApiView(generics.RetrieveDestroyAPIView):
     def list_order_detail(self, request):
         user = request.user
         orders = Order.objects.filter(user=user)
-        serializer = OrderSerializer(orders, many=True)
+        serializer = OrderSerializer(orders, many=False)
         total_price = orders.aggregate(total_price=Sum('cartitem__price'))['total_price']
 
         return Response({"total_price": total_price, "details": serializer.data}, status=status.HTTP_200_OK)
@@ -161,26 +157,19 @@ def send_notification(message):
         print(f"Error sending Telegram notification: {str(e)}")
 
 
-# Rest of your code...
-
-
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
 def send_order_notification(sender, instance, created, **kwargs):
     if created:
-        # Replace 'https://your-api-url.com/get_order_price' with the actual API URL
-        api_url = 'http://127.0.0.1:8000/api/v1/orders/'
+        api_url = 'http://127.0.0.1:8000/api/v1/orders/'  # Use Django settings for the API URL
 
         try:
-            response = requests.get(api_url, params={'order_id': instance.id})
+            response = requests.post(api_url)
+            response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
 
-            if response.status_code == 200:
-                price_data = response.json()
-                price = price_data.get('price')
-            else:
-                price = 'Price not available'
-        except requests.exceptions.RequestException as e:
-            # Handle request-related errors (e.g., network issues)
-            price = 'Error fetching price from API'
+            price_data = response.json()
+            price = price_data.get('price')
+        except:
+            price = response.json()
 
         message = "Новый заказ!\n\n"
         message += f"Имя заказчика: {instance.person_name}\n"
