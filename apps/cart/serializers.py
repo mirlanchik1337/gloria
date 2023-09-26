@@ -60,7 +60,7 @@ class CartItemSerializer(serializers.ModelSerializer):
             for postcard in obj.product.postcard_set.all():
                 # Check if postcard has a price and price.price attribute before using it
                 if hasattr(postcard, 'price') and hasattr(postcard.price, 'price'):
-                    postcard_price = postcard.price.price * obj.quantity
+                    postcard_price = postcard.price.price
                     extra_price += postcard_price
 
         return extra_price
@@ -80,7 +80,7 @@ class CartItemSerializer(serializers.ModelSerializer):
 
         # Calculate total price based on the selected product
         if obj.product:
-            total_price += obj.product.price * obj.quantity
+            total_price += obj.product.price
         elif obj.product.postcard_set:
             total_price += obj.product.postcard_set.price
         elif obj.balls:
@@ -106,11 +106,10 @@ class CartItemSerializer(serializers.ModelSerializer):
             'categories': instance.product.categories.id if instance.product and instance.product.categories else None,
             'subcategories': instance.product.subcategories.id if instance.product and instance.product.subcategories else None,
             'product_quantity': instance.product.product_quantity if instance.product else None,
-            'balls': BalloonsSerializer(instance.product.balls_set.all(),
-                                        many=True).data if instance.product.balls_set.exists() else None,
-            'postcard': PostCardSerializer(instance.product.postcard_set.all(),
-                                           many=True).data if instance.product.postcard_set.exists() else None,
-
+            'balls': [
+                ball for ball in instance.product.balls_set.all() if ball.user_product == instance.user.id
+            ],
+            'postcard': PostCardSerializer(instance.product.postcard_set.all(), many=True).data if instance.product.postcard_set.exists() else None,
         }
         representation.update(cart_representation)
         return representation

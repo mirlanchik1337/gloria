@@ -9,11 +9,12 @@ from ..product.models import Product, Transport, PostCardPrice, FontSize
 from ..product.permissions import IsOwner
 from ..cart import services
 
+
 class CartItemListView(services.CartItemListViewService):
     queryset = CartItem.objects.all()
     serializer_class = serializers.CartItemSerializer
     lookup_field = 'id'
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 
 class CartItemDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -83,6 +84,7 @@ class OrderDetailApiView(services.OrderDetailServiceApiView):
     serializer_class = serializers.OrderSerializer
     permission_classes = [IsAuthenticated, IsOwner]
     lookup_field = 'id'
+
 
 class OrderHistoryApiView(generics.ListAPIView):
     queryset = Order.objects.all()

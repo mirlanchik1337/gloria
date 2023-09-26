@@ -172,7 +172,6 @@ class PostCard(models.Model):
         verbose_name_plural = "Открытка"
 
 
-
 class FontSize(models.Model):
     size = models.IntegerField(verbose_name='Размер шрифта')
     price = models.DecimalField(max_digits=5, decimal_places=2)
@@ -190,8 +189,11 @@ class Balls(models.Model):
     is_cart = models.BooleanField(default=False, verbose_name='Добавление надписи к шару')
     balls_size = models.ForeignKey(FontSize, on_delete=models.CASCADE, default=10, verbose_name='Размер шрифта')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='cart_items_balls')
+    user_product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукт пользователя')
 
+    def get_queryset(self, request):
+        return self.objects.filter(user=request.user, user_product=self.user_product,
+                                   postcard=self.user_product.postcard_set)
 
     def __str__(self):
         return f'{self.user}_{self.text}'

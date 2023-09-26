@@ -13,6 +13,8 @@ from apps.cart.serializers import OrderSerializer, CartItemSerializer
 import requests
 from django.db import transaction
 
+from apps.product.models import PostCard
+
 
 def calculate_order_volume(cart_items):
     order_volume = 0
@@ -112,28 +114,54 @@ class CartItemListViewService(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        data['user'] = request.user.id
+
+        product = data.get('product')
         quantity = int(data.get('quantity', 1))
-        product = data.get('product.product_quantity', 1)
+
         existing_item = CartItem.objects.filter(user=request.user, product=product).first()
+
         if existing_item:
+            # Обновляем существующий объект
             existing_item.quantity += quantity
             existing_item.save()
             serializer = self.get_serializer(existing_item)
-            return Response(serializer.data)
         else:
+            # Создаем новый объект
             serializer = self.get_serializer(data=data)
 
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Define the send_notification function (replace this with your actual notification logic)
+import requests
+
+TELEGRAM_BOT_TOKEN = '6470236178:AAEvFdGt-NrVR6gAEI_bdWLbjdLC81ZigEE'
+TELEGRAM_CHAT_ID = '5416111170'  # The chat ID where you want to send notifications
+
+
 def send_notification(message):
-    # Replace this with your notification sending code (e.g., sending an email or a push notification)
-    print(f"Sending notification: {message}")
+    url = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage'
+    params = {
+        'chat_id': TELEGRAM_CHAT_ID,
+        'text': message
+    }
+
+    try:
+        response = requests.post(url, params=params)
+        if response.status_code != 200:
+            print(f"Failed to send Telegram notification: {response.status_code} - {response.text}")
+        else:
+            print(f"Notification sent successfully: {message}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending Telegram notification: {str(e)}")
+
+
+# Rest of your code...
 
 
 @receiver(post_save, sender=Order, dispatch_uid="send_order_notification")
@@ -149,7 +177,6 @@ def send_order_notification(sender, instance, created, **kwargs):
                 price_data = response.json()
                 price = price_data.get('price')
             else:
-                # Handle API error or price not found
                 price = 'Price not available'
         except requests.exceptions.RequestException as e:
             # Handle request-related errors (e.g., network issues)

@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
-
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from apps.product import filters as filtration
@@ -26,6 +25,7 @@ from apps.product.serializers import (
 from apps.product.pagination import CustomProductPagination, ProductLimitOffsetPagination
 from .permissions import IsOwner
 from ..cart.models import CartItem
+from ..cart.permissions import IsOwnerOrReadOnly
 
 
 class ProductViewSet(ReadOnlyModelViewSet):
@@ -42,6 +42,8 @@ class ProductViewSet(ReadOnlyModelViewSet):
     ordering = ['id']
     ordering_fields = ['price']
     pagination_class = ProductLimitOffsetPagination
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
@@ -114,12 +116,15 @@ class PostCardViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class TitleOnBallViewSet(ModelViewSet):
-    queryset = Balls.objects.all()
+class TitleOnBallViewSet(viewsets.ModelViewSet):
     serializer_class = BalloonsSerializer
+    permission_classes = [IsOwnerOrReadOnly]  # Используйте свой IsOwnerOrReadOnly класс
 
-    def create(self, request, *args, **kwargs):
+    def get_queryset(self):
+        # Возвращайте только объекты, которые принадлежат текущему пользователю
+        return Balls.objects.filter(user=self.request.user)
+
+    def create(self, request , *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

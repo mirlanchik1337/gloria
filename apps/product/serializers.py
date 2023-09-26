@@ -76,6 +76,9 @@ class PostCardSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     postcard_price = PostCardPriceSerializer(read_only=True, many=False)
 
+    def queryset(self):
+        user = self.context['request'].user
+        return PostCard.objects.filter(user=user)
     class Meta:
         model = PostCard
         fields = "__all__"
