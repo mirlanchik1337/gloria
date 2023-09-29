@@ -105,28 +105,32 @@ class CartItemListViewService(generics.ListCreateAPIView):
         return Response({"message": "All objects in the cart have been successfully deleted."})
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        data['user'] = request.user.id
+        user = request.user
+        product_id = request.data.get('product')
+        quantity = int(request.data.get('quantity', 1))
 
-        product = data.get('product')
-        quantity = int(data.get('quantity', 1))
-
-        existing_item = CartItem.objects.filter(user=request.user, product=product).first()
+        existing_item = CartItem.objects.filter(user=user, product=product_id).first()
 
         if existing_item:
             # Обновляем существующий объект
             existing_item.quantity += quantity
             existing_item.save()
-            serializer = self.get_serializer(existing_item)
-        else:
-            # Создаем новый объект
-            serializer = self.get_serializer(data=data)
+            serializer = self.get_serializer(existing_item, data=request.data,
+                                             partial=True)  # partial=True позволяет обновлять только переданные поля
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(data=request.data)
+
+            if serializer.is_valid():
+                serializer.save(user=user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Define the send_notification function (replace this with your actual notification logic)
