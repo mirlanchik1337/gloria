@@ -1,7 +1,4 @@
-
-from rest_framework.pagination import PageNumberPagination, CursorPagination, LimitOffsetPagination
-
-
+from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
 
 
 class CustomProductPagination(PageNumberPagination):
@@ -14,5 +11,3 @@ class CustomProductPagination(PageNumberPagination):
 class ProductLimitOffsetPagination(LimitOffsetPagination):
     default_limit = 12
     max_limit = 500
-
-

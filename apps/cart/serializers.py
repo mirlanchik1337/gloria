@@ -7,8 +7,6 @@ from apps.cart.models import CartItem, Banners
 from ..product.models import Transport, PostCardPrice, FontSize
 from ..product.serializers import ProductImageSerializer
 from ..product.serializers import BalloonsSerializer, PostCardSerializer
-
-
 class CartItemSerializer(serializers.ModelSerializer):
     product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)
     price = serializers.SerializerMethodField()
@@ -27,71 +25,52 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = "__all__"
 
-
     def get_price(self, obj):
         if obj.product:
             return obj.product.price
 
     def get_product_slug(self, obj):
-        return obj.product.product_slug
+        return obj.product.product_slug if obj.product else None
 
     def get_description(self, obj):
-        if obj.product:
-            return obj.product.description
+        return obj.product.description if obj.product else None
 
     def get_is_hit(self, obj):
-        if obj.product:
-            return obj.product.is_hit
+        return obj.product.is_hit if obj.product else None
 
     def get_categories(self, obj):
-        if obj.product and obj.product.categories:
-            return obj.product.categories.id
+        return obj.product.categories.id if obj.product and obj.product.categories else None
 
     def get_subcategories(self, obj):
-        if obj.product and obj.product.subcategories:
-            return obj.product.subcategories.id
+        return obj.product.subcategories.id if obj.product and obj.product.subcategories else None
 
     def get_extra_price(self, obj):
         extra_price = 0
 
-        # Check if obj.product has postcards and calculate the price based on user-specific information
         if obj.product and hasattr(obj.product, 'postcard_set'):
             for postcard in obj.product.postcard_set.all():
-                # Check if postcard has a price and price.price attribute before using it
                 if hasattr(postcard, 'price') and hasattr(postcard.price, 'price'):
                     postcard_price = postcard.price.price
                     extra_price += postcard_price
 
         return extra_price
 
-    def update(self, instance, validated_data):
-        available_quantity = instance.product.product_quantity if instance.product else 0
-        new_quantity = validated_data.get('quantity', instance.quantity)
-        if new_quantity > available_quantity:
-            new_quantity = available_quantity
-        instance.quantity = new_quantity
-        instance.save()
-
-        return instance
-
     def get_total_price(self, obj):
         total_price = 0
 
-        # Calculate total price based on the selected product
         if obj.product:
             total_price += obj.product.price * obj.quantity
-        elif obj.product.postcard_set:
-            total_price += obj.product.postcard_set.price
-        elif obj.balls:
-            total_price += obj.product.balls_set.price * obj.quantity
+        elif obj.postcard.exists():
+            total_price += obj.postcard.first().price.price * obj.quantity
+        elif obj.balls.exists():
+            total_price += obj.balls.first().price.price * obj.quantity
 
-        # Add the extra price to the total price
         total_price += self.get_extra_price(obj)
 
         return total_price
 
     def get_product_quantity(self, obj):
-        return obj.product.product_quantity
+        return obj.product.product_quantity if obj.product else None
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -105,16 +84,11 @@ class CartItemSerializer(serializers.ModelSerializer):
             'categories': instance.product.categories.id if instance.product and instance.product.categories else None,
             'subcategories': instance.product.subcategories.id if instance.product and instance.product.subcategories else None,
             'product_quantity': instance.product.product_quantity if instance.product else None,
-            'balls': [
-                BalloonsSerializer(instance.product.balls_set.all(),
-                                   many=True).data if instance.product.balls_set else None,
-            ],
-            'postcard': PostCardSerializer(instance.product.postcard_set.all(),
-                                           many=True).data if instance.product.postcard_set.exists() else None,
+            'balls': instance.balls if instance.balls and instance.balls else 1,
+            'postcards':instance.postcards if instance.postcards else 1,
         }
         representation.update(cart_representation)
         return representation
-
 
 class FavoriteSerializer(serializers.ModelSerializer):
     product_images = ProductImageSerializer(many=True, source='product.product_images', read_only=True)

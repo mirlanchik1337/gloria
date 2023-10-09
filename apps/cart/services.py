@@ -14,7 +14,7 @@ from apps.cart.serializers import OrderSerializer, CartItemSerializer
 import requests
 from django.db import transaction
 
-from apps.product.models import PostCard, Product
+from apps.product.models import PostCard, Product, Balls
 
 
 class OrderApiService(generics.ListCreateAPIView):
@@ -109,7 +109,12 @@ class CartItemListViewService(generics.ListCreateAPIView):
         product_id = request.data.get('product')
         quantity = int(request.data.get('quantity', 1))
 
+        # Проверяем, существует ли объект в корзине пользователя
         existing_item = CartItem.objects.filter(user=user, product=product_id).first()
+
+        # Проверяем, есть ли такой продукт в заказах пользователя
+        postcard = PostCard.objects.filter(user=user, product=product_id).first()
+        balls = Balls.objects.filter(user=user, product=product_id).first()
 
         if existing_item:
             # Обновляем существующий объект
@@ -124,6 +129,7 @@ class CartItemListViewService(generics.ListCreateAPIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
+            # Создаем новый объект в корзине пользователя
             serializer = self.get_serializer(data=request.data)
 
             if serializer.is_valid():
